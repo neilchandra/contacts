@@ -3,13 +3,14 @@ AdressBook ::= adressbook TopGroupList
 TopGroupList ::= closeadressbook
 				| opengroup GroupHelper TopGroupList
 
-GroupHelper ::= opencontact ContactStarter GroupHelper
+GroupHelper ::= opencontact Contact GroupHelper
 				| SubGroupList
 
 SubGroupList ::= closegroup
 				 | opengroup GroupHelper SubGroupList
+				 | GroupHelper
 
-ContactStarter ::= Name Number OwnID openFriends FriendsHelper
+Contact ::= Name Number OwnID openFriends FriendsHelper
 
 Name ::= "STRING" closename
 			  | closename
@@ -20,6 +21,6 @@ Number ::= "STRING" closenumber
 OwnId ::= NUMBER closeownid
 				| closeownid
 				   
-FriendsHelper ::= | closefriends
-				 | openid NUMBER closeid ParseFriends
+Friends ::= | closefriends closeContact
+			  | openid NUMBER closeid FriendsID
 

@@ -6,13 +6,13 @@ package contacts.adressbook;
  *
  */
 public class XMLElement extends XML {
-	private AdressBook adressBook;
+	private AddressBook adressBook;
 	
 	/**
 	 * constructor
 	 * @param the adressbook belonging to the xml document
 	 */
-	public XMLElement(AdressBook adressBook) {
+	public XMLElement(AddressBook adressBook) {
 		this.adressBook = adressBook;
 	}
 }

@@ -11,4 +11,8 @@ public class SubGroupList extends XML {
 		this.subGroupList = subGroupList;
 	}
 
+	public SubGroupList(GroupHelper groupHelper) {
+		this.groupHelper = groupHelper;
+	}
+
 }
