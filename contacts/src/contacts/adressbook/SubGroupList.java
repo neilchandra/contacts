@@ -3,10 +3,12 @@ package contacts.adressbook;
 
 public class SubGroupList extends XML {
 
+	String groupName;
 	GroupHelper groupHelper;
 	SubGroupList subGroupList;
 	
-	public SubGroupList(GroupHelper groupHelper, SubGroupList subGroupList) {
+	public SubGroupList(String groupName, GroupHelper groupHelper, SubGroupList subGroupList) {
+		this.groupName = groupName;
 		this.groupHelper = groupHelper;
 		this.subGroupList = subGroupList;
 	}

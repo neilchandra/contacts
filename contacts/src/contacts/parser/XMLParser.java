@@ -30,14 +30,16 @@ public class XMLParser {
 
 	private static TopGroupList parseTopGroupList() throws ParseException {
 		Token curr = t.current();
+		String groupName = "";
 		if(curr == null) {
 			throw new ParseException();
 		} else if(curr.kind == XMLConstants.CLOSEADDRESSBOOK) {
 			return null;
 		} else if(curr.kind == XMLConstants.OPENGROUP) {
 			System.out.println(t.current());
+			groupName = t.current().attribute;
 			t.advance();
-			return new TopGroupList(parseGroupHelper(), parseTopGroupList());
+			return new TopGroupList(groupName, parseGroupHelper(), parseTopGroupList());
 		} else {
 			throw new ParseException();
 		}
@@ -58,6 +60,7 @@ public class XMLParser {
 
 	private static SubGroupList parseSubGroupList() throws ParseException {
 		Token curr = t.current();
+		String groupName = "";
 		if(curr == null){
 			throw new ParseException();
 		} 
@@ -67,8 +70,9 @@ public class XMLParser {
 			return null;
 		} else if (curr.kind == XMLConstants.OPENGROUP) {
 			System.out.println(t.current());
+			groupName = t.current().attribute;
 			t.advance();
-			return new SubGroupList(parseGroupHelper(), parseSubGroupList());
+			return new SubGroupList(groupName, parseGroupHelper(), parseSubGroupList());
 		} else {
 			return new SubGroupList(parseGroupHelper());
 		}
