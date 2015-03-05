@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 import contacts.adressbook.*;
-import contacts.adressbook.Number;
 
 
 public class XMLParser {

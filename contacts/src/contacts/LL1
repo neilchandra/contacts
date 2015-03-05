@@ -1,6 +1,6 @@
-AdressBook ::= adressbook TopGroupList
+AddressBook ::= addressbook TopGroupList
 
-TopGroupList ::= closeadressbook
+TopGroupList ::= closeaddressbook
 				| opengroup GroupHelper TopGroupList
 
 GroupHelper ::= opencontact Contact GroupHelper
@@ -10,17 +10,25 @@ SubGroupList ::= closegroup
 				 | opengroup GroupHelper SubGroupList
 				 | GroupHelper
 
-Contact ::= Name Number OwnID openFriends FriendsHelper
+Contact ::= Name Number OwnID openFriends Friends
 
-Name ::= "STRING" closename
-			  | closename
+Name ::= openname "STRING" closename
 			  
-Number ::= "STRING" closenumber
-				| closenumber
+Number ::= opennumber "STRING" closenumber
 				
-OwnId ::= NUMBER closeownid
-				| closeownid
+OwnId ::= openid NUMBER closeownid
 				   
 Friends ::= | closefriends closeContact
-			  | openid NUMBER closeid FriendsID
+			  | openid NUMBER closeid Friends
 
+3 hash maps
+
+1 hash map names -> contacts
+2 hash map id -> contacts
+3 hash map groupname -> group
+
+4 data representations
+1 xml
+2 parse tree
+3 graph representation
+4 actual adress book with hash tables

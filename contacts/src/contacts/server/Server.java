@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import contacts.adressbook.AddressBook;
+import contacts.parser.AddressBook;
 
 public class Server {
 

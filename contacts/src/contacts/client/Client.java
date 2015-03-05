@@ -2,7 +2,9 @@ package contacts.client;
 
 import java.io.*;
 import java.net.Socket;
+
 import contacts.adressbook.*;
+import contacts.parser.AddressBook;
 
 public class Client {
 

@@ -1,4 +1,4 @@
-package contacts.adressbook;
+package contacts.parser;
 
 
 public class TopGroupList extends XML {
