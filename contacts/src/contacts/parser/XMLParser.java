@@ -4,7 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 import contacts.adressbook.AdressBook;
+import contacts.adressbook.Contact;
 import contacts.adressbook.GroupHelper;
+import contacts.adressbook.SubGroupList;
 import contacts.adressbook.TopGroupList;
 import contacts.adressbook.XML;
 import contacts.adressbook.XMLElement;
@@ -70,7 +72,35 @@ public class XMLParser {
 //							 | openid NUMBER closeid ParseFriends
 //							 
 							 
-	private static GroupHelper parseGroupHelper() {
+	private static GroupHelper parseGroupHelper() throws ParseException {
+		Token curr = t.current();
+		if(curr == null) {
+			throw new ParseException();
+		} else if (curr.kind == XMLConstants.OPENCONTACT) {
+			t.advance();
+			return new GroupHelper(parseContactStarter(), parseGroupHelper());
+		} else {
+			return new GroupHelper(parseSubGroupList());
+		}
+	}
+
+	private static SubGroupList parseSubGroupList() throws ParseException {
+		Token curr = t.current();
+		if(curr == null){
+			throw new ParseException();
+		} 
+		if(curr.kind == XMLConstants.CLOSEGROUP) {
+			t.advance();
+			return null;
+		} else if (curr.kind == XMLConstants.OPENGROUP) {
+			t.advance();
+			return new SubGroupList(parseGroupHelper(), parseSubGroupList());
+		} else {
+			throw new ParseException();
+		}
+	}
+
+	private static Contact parseContact() {
 		// TODO Auto-generated method stub
 		return null;
 	}

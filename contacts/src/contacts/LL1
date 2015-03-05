@@ -11,13 +11,13 @@ SubGroupList ::= closegroup
 
 ContactStarter ::= Name Number OwnID openFriends FriendsHelper
 
-ParseName ::= "STRING" closename
+Name ::= "STRING" closename
 			  | closename
 			  
-ParseNumber ::= "STRING" closenumber
+Number ::= "STRING" closenumber
 				| closenumber
 				
-ParseOwnId ::= NUMBER closeownid
+OwnId ::= NUMBER closeownid
 				| closeownid
 				   
 FriendsHelper ::= | closefriends
