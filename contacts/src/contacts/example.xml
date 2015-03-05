@@ -1,0 +1,11 @@
+<addressBook>
+<group name="friends">
+<group name="special friends">
+
+<contact><name>Nelson Muntz</name><number>1800-204-1234</number><ownid>101</ownid><friends><id>12</id> <id>13</id> <id>14</id></friends></contact>
+</group>
+<contact><name>Jimbo Jones</name><number>1800-204-4059</number><ownid>100</ownid><friends><id>1</id></friends></contact>
+<contact><name>Homer Simpson</name><number>1800-204-5674</number><ownid>12</ownid><friends></friends></contact>
+<contact><name>Seymour Skinner</name><number>1800-204-smor</number><ownid>0</ownid><friends></friends></contact>
+</group>
+</addressBook>

@@ -1,0 +1,25 @@
+AdressBook ::= adressbook TopGroupList
+
+TopGroupList ::= closeadressbook
+				| opengroup GroupHelper TopGroupList
+
+GroupHelper ::= opencontact ContactStarter GroupHelper
+				| SubGroupList
+
+SubGroupList ::= closegroup
+				 | opengroup GroupHelper SubGroupList
+
+ContactStarter ::= Name Number OwnID openFriends FriendsHelper
+
+ParseName ::= "STRING" closename
+			  | closename
+			  
+ParseNumber ::= "STRING" closenumber
+				| closenumber
+				
+ParseOwnId ::= NUMBER closeownid
+				| closeownid
+				   
+FriendsHelper ::= | closefriends
+				 | openid NUMBER closeid ParseFriends
+
