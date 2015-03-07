@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 
 import contacts.adressbook.*;
-import contacts.parser.AddressBook;
+import contacts.parser.ParsedAddressBook;
 
 public class Client {
 
@@ -25,7 +25,7 @@ public class Client {
 	private BufferedWriter writer;
 	
 	/**The local copy of the address book*/
-	private AddressBook addressBook;
+	private ParsedAddressBook addressBook;
 	
 	private int PORT;
 	
