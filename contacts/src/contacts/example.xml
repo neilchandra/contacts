@@ -1,1 +1,62 @@
-<addressBook><group name="friends"><group name="special friends"><contact><name>Nelson Muntz</name><number>1800-204-1234</number><ownid>101</ownid><friends><id>12</id> <id>13</id> <id>14</id></friends></contact></group><contact><name>Jimbo Jones</name><number>1800-204-4059</number><ownid>100</ownid><friends><id>1</id></friends></contact><contact><name>Homer Simpson</name><number>1800-204-5674</number><ownid>12</ownid><friends></friends></contact><contact><name>Seymour Skinner</name><number>1800-204-smor</number><ownid>0</ownid><friends></friends></contact></group></addressBook>
+<addressBook>
+	<group name="Friends">
+		<group name="wayland people">
+			<contact>
+				<name>Ally</name>
+				<number>1800-204-smor</number>
+				<ownid>1</ownid>
+				<friends>
+				</friends>
+			</contact>
+			<contact>
+				<name>Mitchell</name>
+				<number>1800-204-smor</number>
+				<ownid>1</ownid>
+				<friends>
+				</friends>
+			</contact>
+			<contact>
+				<name>Sam</name>
+				<number>1800-204-smor</number>
+				<ownid>1</ownid>
+				<friends>
+				</friends>
+			</contact>
+		</group>
+		<contact>
+			<name>Jo</name>
+			<number>1800-204-smor</number>
+			<ownid>1</ownid>
+			<friends>
+			</friends>
+		</contact>
+		<group name="crew people">
+			<contact>
+				<name>Bayley</name>
+				<number>1800-204-1234</number>
+				<ownid>2</ownid>
+				<friends>
+					<id>0</id>
+				</friends>
+			</contact>
+			<contact>
+				<name>Luke</name>
+				<number>1800-204-1234</number>
+				<ownid>2</ownid>
+				<friends>
+					<id>0</id>
+				</friends>
+			</contact>
+			<group name="still on crew">
+				<contact>
+					<name>Dana</name>
+					<number>1800-204-smor</number>
+					<ownid>1</ownid>
+					<friends>
+					</friends>
+				</contact>
+			</group>
+		</group>
+	</group>
+</addressBook>
+

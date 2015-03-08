@@ -21,4 +21,8 @@ public class Number implements ParseNode {
 		
 	}
 
+	public String getNumber() {
+		return this.number;
+	}
+
 }

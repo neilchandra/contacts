@@ -15,5 +15,8 @@ public class OwnID implements ParseNode {
 	public void toXML(StringBuilder sb) {
 		sb.append(ID);
 	}
+	public Integer getID() {
+		return ID;
+	}
 
 }

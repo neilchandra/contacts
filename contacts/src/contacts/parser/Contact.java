@@ -1,5 +1,8 @@
 package contacts.parser;
 
+import java.util.HashMap;
+
+
 /**
  * contact class
  */
@@ -8,6 +11,7 @@ public class Contact implements ParseNode {
 	Number number;
 	OwnID ownID;
 	Friends friends;
+	HashMap<Integer, Contact> allFriends;
 	/**
 	 * constructor for a contact
 	 * @param name
@@ -39,6 +43,24 @@ public class Contact implements ParseNode {
 		sb.append("</friends>");
 		sb.append("</contact>");
 		
+	}
+	public void addNameToContacts(HashMap<String, Contact> stc) {
+		stc.put(this.name.toString(), this);
+	}
+	public void addidToContacts(HashMap<Integer, Contact> idtc) {
+		idtc.put(this.ownID.getID(), this);
+	}
+	public void addFriendsToContact(HashMap<Integer, Contact> idtc) throws ImaginaryFriendException {
+		HashMap<Integer, Contact> idToFriends = new HashMap<Integer, Contact>();
+		if(this.friends != null)
+			this.friends.addFriendsToContact(idtc, idToFriends);
+		this.allFriends = idToFriends;
+	}
+	public String getName() {
+		return this.name.toString();
+	}
+	public int getID() {
+		return ownID.getID();
 	}
 
 }

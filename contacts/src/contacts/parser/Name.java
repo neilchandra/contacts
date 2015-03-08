@@ -19,5 +19,9 @@ public class Name implements ParseNode {
 			sb.append(this.name);
 		
 	}
+	@Override
+	public String toString() {
+		return this.name;
+	}
 
 }
