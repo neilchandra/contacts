@@ -2,6 +2,8 @@ package contacts.parser;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import contacts.adressbook.*;
 
@@ -11,6 +13,10 @@ import contacts.adressbook.*;
 public class XMLParser {
 	
 	private static XMLTokenizer t;
+	static HashMap<Integer, Contact> idToContact;
+	static HashMap<String, Contact> nameToContact;
+	static HashMap<String, Group> nameToGroup;
+	static ArrayList<Integer> allContacts;
 	/**
 	 * parse method
 	 * @param fileName the name of the xml file containing the address book
@@ -18,8 +24,13 @@ public class XMLParser {
 	 * @throws FileNotFoundException
 	 * @throws ParseException
 	 */
-	public static ParsedAddressBook parse(String fileName) throws FileNotFoundException, ParseException {
+	public static ParsedAddressBook parse(String fileName) 
+			throws FileNotFoundException, ParseException {
 		t = new XMLTokenizer(new FileReader(fileName));
+		idToContact = new HashMap<Integer, Contact>();
+		nameToContact = new HashMap<String, Contact>();
+		nameToGroup = new HashMap<String, Group>();
+		allContacts = new ArrayList<Integer>();
 		t.advance();
 		return parseAddressBook();
 	}
@@ -28,11 +39,16 @@ public class XMLParser {
 	 * @return the address book
 	 * @throws ParseException
 	 */
-	private static ParsedAddressBook parseAddressBook() throws ParseException {
+	private static ParsedAddressBook parseAddressBook() throws ParseException  {
 		Token curr = t.current();
 		if(curr != null && curr.kind == XMLConstants.OPENADDRESSBOOK){
 			t.advance();
-			return new ParsedAddressBook(parseTopGroupList());
+			ParsedAddressBook ab = new ParsedAddressBook(parseTopGroupList());
+			ab.setNameToContact(nameToContact);
+			ab.setIdToContact(idToContact);
+			ab.setNameToGroup(nameToGroup);
+			ab.setAllContacts(allContacts);
+			return ab;
 		} else {
 			throw new ParseException();
 		}
@@ -42,7 +58,7 @@ public class XMLParser {
 	 * @return a top group list
 	 * @throws ParseException
 	 */
-	private static TopGroupList parseTopGroupList() throws ParseException {
+	private static TopGroupList parseTopGroupList() throws ParseException  {
 		Token curr = t.current();
 		String groupName = "";
 		if(curr == null) {
@@ -52,7 +68,10 @@ public class XMLParser {
 		} else if(curr.kind == XMLConstants.OPENGROUP) {
 			groupName = t.current().attribute;
 			t.advance();
-			return new TopGroupList(groupName, parseGroupHelper(), parseTopGroupList());
+			TopGroupList topGroupList = 
+					new TopGroupList(groupName, parseGroupHelper(), parseTopGroupList());
+			nameToGroup.put(groupName, topGroupList);
+			return topGroupList;
 		} else {
 			throw new ParseException();
 		}
@@ -78,7 +97,7 @@ public class XMLParser {
 	 * @return a sub group list
 	 * @throws ParseException
 	 */
-	private static SubGroupList parseSubGroupList() throws ParseException {
+	private static SubGroupList parseSubGroupList() throws ParseException  {
 		Token curr = t.current();
 		String groupName = "";
 		if(curr == null){
@@ -98,7 +117,8 @@ public class XMLParser {
 	/**
 	 * method to parse a contact
 	 * @return a contact
-	 * @throws ParseException
+	 * @throws ParseException 
+	 * @throws ImaginaryFriendException 
 	 */
 	private static Contact parseContact() throws ParseException {
 		Name name = parseName();
@@ -107,7 +127,11 @@ public class XMLParser {
 		Token curr = t.current();
 		if(curr.kind == XMLConstants.OPENFRIENDS){
 			t.advance();
-			return new Contact(name, number, ownID, parseFriends());
+			Contact contact =  new Contact(name, number, ownID, parseFriends());
+			idToContact.put(ownID.getID(), contact);
+			nameToContact.put(name.toString(), contact);
+			allContacts.add(ownID.getID());
+			return contact;
 		} else {
 			throw new ParseException();
 		}
@@ -230,7 +254,10 @@ public class XMLParser {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, ParseException {
 		ParsedAddressBook pab = parse("src/contacts/example.xml");
-		System.out.println(pab.toXML());
+		System.out.println(nameToContact);
+	}
+	public static Contact searchIdToContact(int friendsID) {
+		return idToContact.get(friendsID);
 	}
 
 }

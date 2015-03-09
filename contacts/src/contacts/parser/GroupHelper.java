@@ -51,48 +51,9 @@ public class GroupHelper implements ParseNode {
 			this.subGroupList.addAllGroups(groups);
 		} else if (this.groupHelper != null){
 			this.groupHelper.addAllGroups(groups);
-		}
-		
+		}	
 	}
-	public void addNameToContacts(HashMap<String, Contact> stc) {
-		if(type1 && this.subGroupList != null) {
-			this.subGroupList.addNameToContacts(stc);
-		} else {
-			if(this.groupHelper != null){
-				this.groupHelper.addNameToContacts(stc);
-			}
-			if(this.contact != null) {
-				this.contact.addNameToContacts(stc);
-			}
-		}
-		
-	}
-	public void addidToContacts(HashMap<Integer, Contact> idtc) {
-		if(type1 && this.subGroupList != null) {
-			this.subGroupList.addidToContacts(idtc);
-		} else {
-			if(this.groupHelper != null){
-				this.groupHelper.addidToContacts(idtc);
-			}
-			if(this.contact != null) {
-				this.contact.addidToContacts(idtc);
-			}
-		}
-		
-	}
-	public void addFriendsToContact(HashMap<Integer, Contact> idtc) throws ImaginaryFriendException {
-		if(type1 && this.subGroupList != null) {
-			this.subGroupList.addidToContacts(idtc);
-		} else {
-			if(this.groupHelper != null){
-				this.groupHelper.addFriendsToContact(idtc);
-			}
-			if(this.contact != null) {
-				this.contact.addFriendsToContact(idtc);
-			}
-		}
-		
-	}
+
 	public ArrayList<Group> listGroups(ArrayList<Group> subGroups) {
 		if(type1 && this.subGroupList != null) {
 			return this.subGroupList.listGroups(subGroups);

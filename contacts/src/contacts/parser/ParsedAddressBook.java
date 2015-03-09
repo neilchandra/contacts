@@ -8,8 +8,12 @@ import java.util.LinkedList;
  * address book class
  */
 public class ParsedAddressBook implements ParseNode {
-
-	TopGroupList topGroupList;
+	
+	private HashMap<Integer, Contact> idToContact;
+	private HashMap<String, Contact> nameToContact;
+	private HashMap<String, Group> nameToGroup;
+	private TopGroupList topGroupList;
+	private ArrayList<Integer> allContacts;
 	/**
 	 * constructor
 	 * @param topGroupList
@@ -42,25 +46,7 @@ public class ParsedAddressBook implements ParseNode {
 		}
 		return stg;
 	}
-	public HashMap<String, Contact> nameToContact() {
-		HashMap<String, Contact> stc = new HashMap<String, Contact>();
-		if(this.topGroupList != null) {
-			this.topGroupList.addNameToContacts(stc);
-		}
-		return stc;
-	}
-	public HashMap<Integer, Contact> idToContact() {
-		HashMap<Integer, Contact> idtc = new HashMap<Integer, Contact>();
-		if(this.topGroupList != null) {
-			this.topGroupList.addidToContacts(idtc);
-		}
-		return idtc;
-	}
-	public void addFriendsToContact(HashMap<Integer, Contact> idToContact) throws ImaginaryFriendException {
-		if(this.topGroupList != null) {
-			this.topGroupList.addFriendsToContact(idToContact);
-		}
-	}
+
 	public ArrayList<Group> listGroups() {
 		ArrayList<Group> groups = new ArrayList<Group>();
 		if(this.topGroupList == null) {
@@ -68,6 +54,34 @@ public class ParsedAddressBook implements ParseNode {
 		} else {
 			return this.topGroupList.listGroups(groups);
 		}
+	}
+	public void setNameToContact(HashMap<String, Contact> nameToContact) {
+		this.nameToContact = nameToContact;
+	}
+	public void setIdToContact(HashMap<Integer, Contact> idToContact) {
+		this.idToContact = idToContact;
+	}
+	public void setNameToGroup(HashMap<String, Group> nameToGroup) {
+		this.nameToGroup = nameToGroup;
+	}
+	public void setAllContacts(ArrayList<Integer> allContacts) {
+		this.allContacts = allContacts;
+	}
+	public HashMap<Integer, Contact> getIdToContact() {
+		return this.idToContact;
+	}
+	public HashMap<String, Contact> getNameToContact() {
+		return this.nameToContact;
+	}
+	public HashMap<String, Group> getNameToGroup() {
+		return this.nameToGroup;
+	}
+	public ArrayList<Integer> getAllContacts() {
+		return this.allContacts;
+	}
+	public void addTopGroup(String groupName, HashMap<String, Group> stg) {
+		this.topGroupList = new TopGroupList(groupName, new GroupHelper(null), this.topGroupList);
+		stg.put(groupName, this.topGroupList);
 	}
 
 }

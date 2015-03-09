@@ -15,20 +15,26 @@ public class AddressBook {
 	HashMap<Integer, Contact> idToContact;
 	HashMap<String, Contact> nameToContact;
 	HashMap<String, Group> nameToGroup;
+	ArrayList<Integer> allContacts;
 	ParsedAddressBook pab;
 	/**
 	 * Constructor
 	 * @param pab the parsed address book
 	 * @throws ImaginaryFriendException if a friend does not exist
+	 * @throws ThisIsntMutualException 
 	 */
-	public AddressBook(ParsedAddressBook pab) throws ImaginaryFriendException {
-		if(pab != null) {
-			this.pab = pab;
-			this.nameToGroup = pab.getAllGroups();
-			this.nameToContact = pab.nameToContact();
-			this.idToContact = pab.idToContact();
-			pab.addFriendsToContact(this.idToContact);
-		}	
+	public AddressBook(ParsedAddressBook pab) throws ImaginaryFriendException, ThisIsntMutualException{
+		this.pab = pab;
+		this.idToContact = pab.getIdToContact();
+		this.nameToContact = pab.getNameToContact();
+		this.nameToGroup = pab.getNameToGroup();
+		this.allContacts = pab.getAllContacts();
+		for(Integer i : this.allContacts){
+			this.idToContact.get(i).addFriendsToContact(this.idToContact);
+		}
+		for(Integer i : this.allContacts){
+			this.idToContact.get(i).checkIfMutual();
+		}
 	}
 	/**
 	 * converts the address book to XML
@@ -41,11 +47,14 @@ public class AddressBook {
 	 * Adds a contact to a group g
 	 * @param c a contact
 	 * @param g a group
+	 * @throws ImaginaryFriendException 
 	 */
-	public void addContact(Contact c, Group g) {
+	public void addContact(Contact c, Group g) throws ImaginaryFriendException {
 		g.addContact(c);
 		nameToContact.put(c.getName(), c);
 		idToContact.put(c.getID(), c);
+		c.addFriendsToContact(this.idToContact);
+		c.addMutualFriends();
 	}
 	/**
 	 * lists all the contacts in the group g
@@ -121,9 +130,7 @@ public class AddressBook {
 	 * @param groupName the name of the group
 	 */
 	public void addGroup(String groupName) {
-		ArrayList<Group> topGroups = listGroups();
-		Group lastTopGroup = topGroups.get(topGroups.size() - 1);
-		lastTopGroup.addGroup(groupName, this.nameToGroup);
+		pab.addTopGroup(groupName, this.nameToGroup);
 	}
 	/**
 	 * adds a group as a subgroup of a supergroup
@@ -131,9 +138,7 @@ public class AddressBook {
 	 * @param superGroup the supergroup
 	 */
 	public void addGroup(String groupName, Group superGroup) {
-		ArrayList<Group> groups = listSubGroups(superGroup);
-		Group lastGroup = groups.get(groups.size() - 1);
-		lastGroup.addGroup(groupName, this.nameToGroup);
+		superGroup.addGroup(groupName, this.nameToGroup);
 	}
 	/** 
 	 * main method for testing
@@ -141,13 +146,18 @@ public class AddressBook {
 	 * @throws FileNotFoundException
 	 * @throws ParseException
 	 * @throws ImaginaryFriendException
+	 * @throws ThisIsntMutualException 
 	 */
-	public static void main(String[] args) throws FileNotFoundException, ParseException, ImaginaryFriendException {
+	public static void main(String[] args) throws FileNotFoundException, ParseException, ImaginaryFriendException, ThisIsntMutualException {
 		ParsedAddressBook pab = XMLParser.parse("src/contacts/example.xml");
 		AddressBook ab = new AddressBook(pab);	
-		Contact samaha = new Contact(new Name("samaha"), new Number(null), new OwnID(4), null);
+		Contact samaha = new Contact(new Name("samaha"), new Number(null), new OwnID(10), new Friends(1, null));
 		ab.addGroup("class board");
 		ab.addContact(samaha, ab.nameToGroup.get("class board"));
+		ab.addGroup("north wayland");
+		ab.addGroup("third floor", ab.nameToGroup.get("north wayland"));
+		Contact neil = new Contact(new Name("neil"), new Number(null), new OwnID(11), null);
+		ab.addContact(neil, ab.nameToGroup.get("third floor"));
 		ab.printAdressBook();
 		System.out.println(ab.toXML());
 	}

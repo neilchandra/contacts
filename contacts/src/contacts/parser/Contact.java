@@ -1,5 +1,6 @@
 package contacts.parser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -11,13 +12,15 @@ public class Contact implements ParseNode {
 	Number number;
 	OwnID ownID;
 	Friends friends;
-	HashMap<Integer, Contact> allFriends;
+	HashMap<Integer, Contact> idToFriends;
+	ArrayList<Integer> allFriends;
 	/**
 	 * constructor for a contact
 	 * @param name
 	 * @param number
 	 * @param ownID
 	 * @param friends
+	 * @throws ImaginaryFriendException 
 	 */
 	public Contact(Name name, Number number, OwnID ownID, Friends friends) {
 		this.name = name;
@@ -44,17 +47,13 @@ public class Contact implements ParseNode {
 		sb.append("</contact>");
 		
 	}
-	public void addNameToContacts(HashMap<String, Contact> stc) {
-		stc.put(this.name.toString(), this);
-	}
-	public void addidToContacts(HashMap<Integer, Contact> idtc) {
-		idtc.put(this.ownID.getID(), this);
-	}
-	public void addFriendsToContact(HashMap<Integer, Contact> idtc) throws ImaginaryFriendException {
-		HashMap<Integer, Contact> idToFriends = new HashMap<Integer, Contact>();
-		if(this.friends != null)
-			this.friends.addFriendsToContact(idtc, idToFriends);
-		this.allFriends = idToFriends;
+	public void addFriendsToContact(HashMap<Integer, Contact> idToContact) throws ImaginaryFriendException {
+		this.idToFriends = new HashMap<Integer, Contact>();
+		this.allFriends = new ArrayList<Integer>();
+		if(this.friends != null) {
+			this.friends.addFriendsToContact(idToContact, idToFriends);
+			this.friends.addAllFriends(this.allFriends);
+		}
 	}
 	public String getName() {
 		return this.name.toString();
@@ -62,5 +61,28 @@ public class Contact implements ParseNode {
 	public int getID() {
 		return ownID.getID();
 	}
-
+	public void checkIfMutual() throws ThisIsntMutualException {
+		for(Integer i : this.allFriends) {
+			if(!this.idToFriends.get(i).isFriendsWith(getID())) {
+				System.out.println(getName());
+				System.out.println(idToFriends.get(i).getName());
+				throw new ThisIsntMutualException();
+			}
+		}
+		
+	}
+	private boolean isFriendsWith(Integer i) {
+		return this.idToFriends.containsKey(i);
+	}
+	public void addMutualFriends() {
+		for(Integer i : this.allFriends) {
+			this.idToFriends.get(i).addFriend(this);
+		}
+	}
+	private void addFriend(Contact contact) {
+		int friendsID = contact.getID();
+		this.allFriends.add(friendsID);
+		this.idToFriends.put(friendsID, contact);
+		this.friends = new Friends(friendsID, this.friends);	
+	}
 }

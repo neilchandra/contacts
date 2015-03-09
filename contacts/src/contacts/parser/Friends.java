@@ -1,5 +1,6 @@
 package contacts.parser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -28,16 +29,22 @@ public class Friends implements ParseNode {
 		}
 	}
 
-	public void addFriendsToContact(HashMap<Integer, Contact> idtc,
+	public void addFriendsToContact(HashMap<Integer, Contact> idToContact,
 			HashMap<Integer, Contact> idToFriends) throws ImaginaryFriendException {
-		Contact myFriend = idtc.get(this.friendsID);
+		Contact myFriend = idToContact.get(this.friendsID);
 		if(myFriend == null)  {
 			throw new ImaginaryFriendException();
 		} else {
 			idToFriends.put(this.friendsID, myFriend);
 		}
 		if(this.friends != null) {
-			addFriendsToContact(idtc, idToFriends);
+			this.friends.addFriendsToContact(idToContact, idToFriends);
+		}
+	}
+	public void addAllFriends(ArrayList<Integer> allFriends) {
+		allFriends.add(friendsID);
+		if(this.friends != null) {
+			this.friends.addAllFriends(allFriends);
 		}
 	}
 

@@ -58,25 +58,6 @@ public class SubGroupList implements ParseNode, Group {
 		}
 		
 	}
-	public void addNameToContacts(HashMap<String, Contact> stc) {
-		if(type1) {
-			if(this.subGroupList != null)
-				this.subGroupList.addNameToContacts(stc);
-		}
-		if(this.groupHelper != null) {
-			this.groupHelper.addNameToContacts(stc);
-		}	
-	}
-	public void addidToContacts(HashMap<Integer, Contact> idtc) {
-		if(type1) {
-			if(this.subGroupList != null)
-				this.subGroupList.addidToContacts(idtc);
-		}
-		if(this.groupHelper != null) {
-			this.groupHelper.addidToContacts(idtc);
-		}	
-		
-	}
 	@Override
 	public ArrayList<Group> listGroups(ArrayList<Group> subGroups) {
 		if(type1) {
@@ -135,19 +116,11 @@ public class SubGroupList implements ParseNode, Group {
 	}
 	@Override
 	public void addGroup(String groupName, HashMap<String, Group> stg) {
-		this.subGroupList = new SubGroupList(groupName, null, null);
+		this.subGroupList = new SubGroupList(groupName, new GroupHelper(null), this.subGroupList);
 		stg.put(groupName, this.subGroupList);		
 	}
 	@Override
 	public void addContact(Contact c) {
-		if(this.type1) {
-			
-		} else {
-			if(this.groupHelper == null) {
-				this.groupHelper.addContact(c);
-			} else {
-				this.groupHelper = new GroupHelper(c, null);
-			}
-		}
+		this.groupHelper = new GroupHelper(c, this.groupHelper);
 	}
 }

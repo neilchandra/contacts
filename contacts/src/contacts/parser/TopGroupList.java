@@ -41,25 +41,7 @@ public class TopGroupList implements ParseNode, Group {
 		if(this.topGroupList != null)
 			this.topGroupList.addAllGroups(stg);
 	}
-	public void addNameToContacts(HashMap<String, Contact> stc) {
-		if(this.groupHelper != null)
-			this.groupHelper.addNameToContacts(stc);
-		if(this.topGroupList != null)
-			this.topGroupList.addNameToContacts(stc);
-	}
-	public void addidToContacts(HashMap<Integer, Contact> idtc) {
-		if(this.groupHelper != null)
-			this.groupHelper.addidToContacts(idtc);
-		if(this.topGroupList != null)
-			this.topGroupList.addidToContacts(idtc);
-	}
-	public void addFriendsToContact(HashMap<Integer, Contact> idtc) throws ImaginaryFriendException {
-		if(this.groupHelper != null)
-			this.groupHelper.addFriendsToContact(idtc);
-		if(this.topGroupList != null)
-			this.topGroupList.addFriendsToContact(idtc);
-		
-	}
+
 	public ArrayList<Group> listGroups(ArrayList<Group> groups) {
 		groups.add(this);
 		if(this.topGroupList == null) {
@@ -89,10 +71,11 @@ public class TopGroupList implements ParseNode, Group {
 			return this.groupHelper.listContacts(contacts);
 		}
 	}
-	
-	public void addGroup(String groupName, HashMap<String, Group> stg) {
-		this.topGroupList = new TopGroupList(groupName, null, null);
-		stg.put(groupName, this.topGroupList);
+	public void addGroup(String groupName, HashMap<String, Group> stg){
+		SubGroupList g = new SubGroupList(groupName, new GroupHelper(null), new SubGroupList(this.groupHelper));
+		GroupHelper newGroupHelper = new GroupHelper(g);
+		this.groupHelper = newGroupHelper;
+		stg.put(groupName, g);
 	}
 	@Override
 	public void addContact(Contact c) {
