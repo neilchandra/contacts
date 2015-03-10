@@ -224,6 +224,79 @@ public class AddressBook {
 	public String intToName(int ownID) {
 		return this.idToContact.get(ownID).getName();
 	}
+	
+	/**
+	 * test cases
+	 */
+	public static void testAddressBook() {
+		//start with the empty addresss book
+		AddressBook ab = null;
+		try {
+			ab = new AddressBook(XMLParser.parseString("<addressBook></addressBook>"));
+			// code should be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			System.out.println(false);
+			// code should be unreachable
+		}
+		System.out.println("========== adding top groups ==========");
+		ab.addGroup("Brown");
+		System.out.println(ab.toXML().equals(
+				"<addressBook><group name=\"Brown\"></group></addressBook>"));
+		ab.addGroup("RISD");
+		System.out.println(ab.toXML().equals(
+				"<addressBook><group name=\"RISD\"></group>"
+				+ "<group name=\"Brown\"></group></addressBook>"));
+		System.out.println("========== listing top groups ==========");
+		System.out.println(ab.listGroups().size() == 2);
+		System.out.println("========== adding contacts to top groups ==========");
+		try {
+			ab.addContact(ab.makeContact("Mitch", "555", 1, new int[0]), ab.nameToGroup.get("Brown"));
+			// should be reachable code
+			System.out.println(true);
+		} catch (ImaginaryFriendException e1) {
+			// should be unreachable code
+			System.out.println(false);
+		}
+		try {
+			ab.addContact(ab.makeContact("Neil", "101", 2, new int[]{1}), ab.nameToGroup.get("RISD"));
+			// should be reachable code
+			System.out.println(true);
+		} catch (ImaginaryFriendException e) {
+			// should be unreachable code
+			System.out.println(false);
+		}
+		System.out.println(ab.toXML().equals(
+				"<addressBook><group name=\"RISD\"><contact><name>Neil</name>"
+			  + "<number>101</number><ownid>2</ownid><friends><id>1</id>"
+			  + "</friends></contact>"
+			  + "</group><group name=\"Brown\">"
+			  + "<contact><name>Mitch</name><number>555</number><ownid>1</ownid>"
+			  + "<friends><id>2</id></friends></contact></group></addressBook>"));
+		System.out.println("========== removing contacts ==========");
+		try {
+			ab.removeContact("Neil");
+			ab.removeContact("Mitch");
+			// this code should be reached
+			System.out.println(true);
+		} catch (Exception e) {
+			// code should be unreachable
+			System.out.println(false);
+		}
+		System.out.println(ab.nameToContact.get("Mitchell") == null);
+		System.out.println(ab.nameToContact.get("Neil") == null);
+		System.out.println(ab.allContacts.size() == 0);
+		System.out.println(ab.toXML().equals(
+				"<addressBook><group name=\"RISD\"></group>"
+				+ "<group name=\"Brown\"></group></addressBook>"));
+		System.out.println("========== adding subgroups ==========");
+		ab.addGroup("CS TAs", ab.nameToGroup.get("Brown"));
+		ab.addGroup("awesome TAs", ab.nameToGroup.get("CS TAs"));
+		System.out.println(ab.toXML().equals(
+				"<addressBook><group name=\"RISD\"></group><group name=\"Brown\"><group "
+				+ "name=\"CS TAs\"><group name=\"awesome TAs\"></group></group>"
+				+ "</group></addressBook>"));
+	}
 	/** 
 	 * main method for testing
 	 * @param args
@@ -232,23 +305,9 @@ public class AddressBook {
 	 * @throws ImaginaryFriendException
 	 * @throws ThisIsntMutualException 
 	 */
-	public static void main(String[] args) throws FileNotFoundException, ParseException, ImaginaryFriendException, ThisIsntMutualException {
-		ParsedAddressBook pab = XMLParser.parse("src/contacts/example.xml");
-		AddressBook ab = new AddressBook(pab);	
-		Contact samaha = new Contact(new Name("samaha"), new Number(null), new OwnID(10), new Friends(1, null));
-		ab.addGroup("class board");
-		ab.addContact(samaha, ab.nameToGroup.get("class board"));
-		ab.addGroup("north wayland");
-		ab.addGroup("third floor", ab.nameToGroup.get("north wayland"));
-		Contact neil = new Contact(new Name("neil"), new Number(null), new OwnID(11), null);
-		ab.addContact(neil, ab.nameToGroup.get("third floor"));
-		ab.printAdressBook();
-		System.out.println(ab.toXML());
-		ab.removeContact("Ally");
-		ab.removeContact("neil");
-		System.out.println(ab.toXML());
-		ParsedAddressBook pab2 = XMLParser.parseString(ab.toXML());
-		AddressBook ab2 = new AddressBook(pab2);
-		System.out.println(ab2.toXML());
+	public static void main(String[] args) throws FileNotFoundException, ParseException,
+		ImaginaryFriendException, ThisIsntMutualException {
+		testAddressBook();
+
 	}
 }
