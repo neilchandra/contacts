@@ -21,13 +21,10 @@ public class Server {
 	BufferedReader clientInput;
 	BufferedWriter clientWriter;
 	
-	/**The local copy of the address book*/
-	private AddressBook addressBook;
+	private Graph graph;
 	
-	public Server(int _port) throws IOException, ParseException, ImaginaryFriendException, ThisIsntMutualException {
-		ParsedAddressBook pab = XMLParser.parse("src/contacts/example.xml");
-		addressBook = new AddressBook(pab);
-		
+	public Server(int _port, String xml) throws IOException, ParseException, ImaginaryFriendException, ThisIsntMutualException {
+		this.graph = new Graph(xml);
 		port = _port;
 		serv = new ServerSocket(port);
 		finished = false;
@@ -71,7 +68,7 @@ public class Server {
 		content = content.toLowerCase();
 		switch(content) {
 			case "pull" :
-				sendToClient(addressBook.toXML(), socket);
+				sendToClient(graph.toXML(), socket);
 				break;
 			case "push" :
 				//do something
@@ -98,7 +95,7 @@ public class Server {
 	 */
 	public static void main(String[] args) throws ParseException, ImaginaryFriendException, ThisIsntMutualException {
 		try {
-			Server s = new Server(1818);
+			Server s = new Server(1818, "this should be a string of xml?");
 			s.getClientInput();
 		} catch (IOException e) {
 			e.printStackTrace();

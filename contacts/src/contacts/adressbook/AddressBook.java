@@ -6,6 +6,8 @@ import java.util.HashMap;
 
 import contacts.parser.*;
 import contacts.parser.Number;
+import contacts.server.Graph;
+import contacts.server.Node;
 /**
  * address book class
  *
@@ -94,7 +96,35 @@ public class AddressBook {
 		}
 	}
 	/**
-	 * for testing.. prints the addressbook
+	 * creates a contact 
+	 * @param name string representing name
+	 * @param num string representing id
+	 * @param id int representing id
+	 * @param friendsID array of friends id
+	 * @return a contact
+	 */
+	public Contact makeContact(String name, String num, int id, int[] friendsID) {
+		Name theName = new Name(name);
+		Number theNum = new Number(num);
+		OwnID ownID = new OwnID(id);
+		Friends f = makeFriends(friendsID, 0);
+		return new Contact(theName, theNum, ownID, f);
+	}
+	/**
+	 * helper to make it possible to return a contact
+	 * @param friendsID an array of the id of friends
+	 * @param i the current index
+	 * @return an instance of Friends
+	 */
+	private Friends makeFriends(int[] friendsID, int i) {
+		if(i < friendsID.length) {
+			return new Friends(friendsID[i], makeFriends(friendsID, ++i));
+		} else {
+			return null;
+		}
+	}
+	/**
+	 * for testing, prints the addressbook
 	 */
 	public void printAdressBook() {
 		for(Group g : listGroups()) {
@@ -105,7 +135,7 @@ public class AddressBook {
 		}
 	}
 	/**
-	 * for testing.. prints sub groups of a group
+	 * for testing, prints sub groups of a group
 	 * @param g the group
 	 */
 	private void printGroups(Group g) {
@@ -117,7 +147,7 @@ public class AddressBook {
 		}
 	}
 	/**
-	 * for testing.. prints the members of a group
+	 * for testing, prints the members of a group
 	 * @param g the group
 	 */
 	private void printMembers(Group g) {
@@ -141,8 +171,15 @@ public class AddressBook {
 	public void addGroup(String groupName, Group superGroup) {
 		superGroup.addGroup(groupName, this.nameToGroup);
 	}
-	
+	/**
+	 * removes a contact 
+	 * @param contactName
+	 * @throws ImaginaryFriendException if the contact doesn't exist
+	 */
 	public void removeContact(String contactName) throws ImaginaryFriendException {
+		if(!this.nameToContact.containsKey(contactName)) {
+			throw new ImaginaryFriendException();
+		}
 		Contact c = this.nameToContact.get(contactName);
 		if(c == null) {
 			throw new ImaginaryFriendException();
@@ -152,6 +189,40 @@ public class AddressBook {
 		this.idToContact.remove(id);
 		this.nameToContact.remove(contactName);
 		this.allContacts.remove(this.allContacts.lastIndexOf(c.getID()));
+	}
+	/**
+	 * builds a graph
+	 * @param graph the graph to build
+	 */
+	public void buildGraph(Graph graph) {
+		HashMap<Integer, Node> intToNode = new HashMap<Integer, Node>();
+		for(int i : this.allContacts) {
+			Node node = new Node(i);
+			graph.addNode(node);
+			intToNode.put(i, node);
+		}
+		for(int i : this.allContacts) {
+			for (int j : this.idToContact.get(i).getAllFriends()) {
+				intToNode.get(i).addChild(intToNode.get(j));
+			}
+		}
+		graph.setIntToNode(intToNode);		
+	}
+	/**
+	 * converts from a contact name to their id
+	 * @param contactName
+	 * @return
+	 */
+	public int nameToInt(String contactName) {
+		return this.nameToContact.get(contactName).getID();
+	}
+	/**
+	 * converts from a contact's own id to their name
+	 * @param ownID
+	 * @return
+	 */
+	public String intToName(int ownID) {
+		return this.idToContact.get(ownID).getName();
 	}
 	/** 
 	 * main method for testing

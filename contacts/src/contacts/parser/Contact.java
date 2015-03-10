@@ -28,7 +28,10 @@ public class Contact implements ParseNode {
 		this.ownID = ownID;
 		this.friends = friends;
 	}
-	
+	/**
+	 * sets the group helper of the contact
+	 * @param gh the group helper
+	 */
 	public void setGroupHelper(GroupHelper gh){
 		this.gh = gh;
 	}
@@ -49,9 +52,14 @@ public class Contact implements ParseNode {
 			this.friends.toXML(sb);
 		sb.append("</friends>");
 		sb.append("</contact>");
-		
 	}
-	public void addFriendsToContact(HashMap<Integer, Contact> idToContact) throws ImaginaryFriendException {
+	/**
+	 * adds friends to the contact
+	 * @param idToContact
+	 * @throws ImaginaryFriendException if the friends do not exist
+	 */
+	public void addFriendsToContact(HashMap<Integer, Contact> idToContact) 
+			throws ImaginaryFriendException {
 		this.idToFriends = new HashMap<Integer, Contact>();
 		this.allFriends = new ArrayList<Integer>();
 		if(this.friends != null) {
@@ -59,12 +67,24 @@ public class Contact implements ParseNode {
 			this.friends.addAllFriends(this.allFriends);
 		}
 	}
+	/**
+	 * returns the name of the contact
+	 * @return the name of the contact
+	 */
 	public String getName() {
 		return this.name.toString();
 	}
+	/**
+	 * returns the id of the contact 
+	 * @return the id of the contact 
+	 */
 	public int getID() {
 		return ownID.getID();
 	}
+	/**
+	 * checks if all friend ships are mutual
+	 * @throws ThisIsntMutualException
+	 */
 	public void checkIfMutual() throws ThisIsntMutualException {
 		for(Integer i : this.allFriends) {
 			if(!this.idToFriends.get(i).isFriendsWith(getID())) {
@@ -73,8 +93,12 @@ public class Contact implements ParseNode {
 				throw new ThisIsntMutualException();
 			}
 		}
-		
 	}
+	/**
+	 * returns true if the contact is friends with the contact with id i
+	 * @param i the id of the other contact
+	 * @return true if they are friends, false otherwise
+	 */
 	private boolean isFriendsWith(Integer i) {
 		return this.idToFriends.containsKey(i);
 	}
@@ -104,5 +128,9 @@ public class Contact implements ParseNode {
 		} else {
 			this.friends.remove(i, null);
 		}
+	}
+
+	public ArrayList<Integer> getAllFriends() {
+		return this.allFriends;
 	}
 }

@@ -43,7 +43,7 @@ public class XMLParser {
 	 * @throws ParseException
 	 */
 	public static ParsedAddressBook parseString(String xml) 
-			throws FileNotFoundException, ParseException {
+			throws ParseException {
 		t = new XMLTokenizer(new StringReader(xml));
 		idToContact = new HashMap<Integer, Contact>();
 		nameToContact = new HashMap<String, Contact>();
