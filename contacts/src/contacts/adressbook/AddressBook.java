@@ -12,6 +12,7 @@ import contacts.parser.Number;
  */
 public class AddressBook {
 	
+	Graph g;
 	HashMap<Integer, Contact> idToContact;
 	HashMap<String, Contact> nameToContact;
 	HashMap<String, Group> nameToGroup;
@@ -139,6 +140,13 @@ public class AddressBook {
 	 */
 	public void addGroup(String groupName, Group superGroup) {
 		superGroup.addGroup(groupName, this.nameToGroup);
+	}
+	
+	public void setGraph() {
+		for(int i : this.allContacts) {
+			Contact c = this.idToContact.get(i);
+			
+		}
 	}
 	/** 
 	 * main method for testing
