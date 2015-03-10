@@ -1,136 +1,156 @@
 package contacts.client;
 
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
 
-import contacts.adressbook.*;
 import contacts.parser.ParsedAddressBook;
 
 public class Client {
 
-	/** Buffered reader for user input */
-	private BufferedReader user;
-	
-	/** indicates if interaction is over*/
-	private boolean finished; 
-	
+	/** indicates if interaction is over */
+	private boolean finished;
+
 	/** The socket to interact from */
 	private Socket socket;
-	
-	/**input and output streams*/
+
+	/** input and output streams */
 	private InputStream inputStream;
 	private OutputStream outputStream;
 
-	/**the writer that flushes to the server*/
-	private BufferedWriter writer;
+	/** Buffered readers for user input and server signals */
+	private BufferedReader userReader;
+	private BufferedReader servReader;
+
+	/** Writers that writer to the server and the user */
+	private BufferedWriter servWriter;
+	private BufferedWriter userWriter;
 	
 	/**The local copy of the address book*/
 	private ParsedAddressBook addressBook;
-	
-	private int PORT;
-	
-	public Client(int port) throws IOException {
-		user = new BufferedReader(new InputStreamReader(System.in));	
-		socket = new Socket("localhost", PORT);
+
+	private int port;
+
+	public Client(int _port) throws IOException {
+		port = _port;
+		socket = new Socket("localhost", port);
+		finished = false;
 		inputStream = socket.getInputStream();
 		outputStream = socket.getOutputStream();
-		finished = false;
-		PORT = port;
-	}
-	
-	private void sendAddressBook() {
-		//TODO: convert addressBook to XML and send line by line
+		userReader = new BufferedReader(new InputStreamReader(System.in));
+		servReader = new BufferedReader(new InputStreamReader(inputStream));
+		userWriter = new BufferedWriter(new OutputStreamWriter(System.out));
+		servWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
 	}
 
-	private void receiveAddressBook() {
-		//TODO: receive addressbook line by line and covert to Addressbook
-		//then store as current addressbook
-	}
-	
-	private void listenToUser() throws IOException {
-		while(!finished) {
-			// Read command in and break in words
-			String command = user.readLine();
-			
-			switch(command) {
-				case "remove" : 
-					//prompts for name of contact to be deleted					
-					System.out.print("name:");
-					command = user.readLine();
-					//contact should be deleted and references from friends deleted
-					
-					//test code
-					outputStream.write(1);
-					user.close();
-					outputStream.flush();
-					socket.shutdownOutput();
-					waitForServer();
-					break;
-				case "group" :
-					//prompts user for group name
-					System.out.print("group name:");
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
 
-					//prints out all members of that group
-					break;
-				case "pull" :
-					//retrieves the latest version of the addressbook from the server
-					//converts that XML version into an addressbook
-					//sets addressbook equal to that newly parsed one
-					receiveAddressBook();
-					
-					break;
-				case "push" :
-					//writes Client version of addressbook to XML
-					//sends that XML version to the server
-					sendAddressBook();
-					
-					break;
-				case "query path" :
-					//do stuff
-					break;
-				case "query mutual" :
-					//do stuff
-					break;
-				case "quit" :
-					//saves addressbook and exits the program
-					finished = true;
-					break;
-				default :
-					System.out.println("Please input one of the following: remove, "
-							+ "group, pull, push, query path, query mutual, quit");
-					break;
-			}
-			
-		}
-	}
-	
-	private void waitForServer() throws IOException {
-		BufferedReader input = new BufferedReader(new InputStreamReader(
-				inputStream));
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-				System.out));
-
-		int content = input.read();
-		while (content != -1) {
-			writer.write(content);
-
-			content = input.read();
-
-		}
-		writer.flush();
-		socket.shutdownInput();	
-		listenToUser();
-	}
-	
-	
-	public static void main (String[] args) {
+		Client c;
 		try {
-			Client c = new Client(8080);
-			c.listenToUser();
-			c.waitForServer();
+			c = new Client(1818);
+			c.getUserInput();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	private void getUserInput() throws IOException {
+		while (!finished) {
+
+			// Read command in and break in words
+			String command = userReader.readLine();
+			command = command.toLowerCase();
+
+			switch (command) {
+			case "remove":
+				// prompts for name of contact to be deleted
+				System.out.print("name:");
+				command = userReader.readLine();
+				// contact should be deleted and references from friends deleted
+
+				break;
+			case "group":
+				// prompts user for group name
+				System.out.print("group name:");
+
+				// prints out all members of that group
+				break;
+			case "pull":
+				// retrieves the latest version of the addressbook from the
+				// server
+				// converts that XML version into an addressbook
+				// sets addressbook equal to that newly parsed one
+				
+				sendToServer("PULL");
+				
+				getServerOutput();
+				receiveAddressBook();
+
+				break;
+			case "push":
+				// writes Client version of addressbook to XML
+				// sends that XML version to the server
+				sendToServer("PUSH");
+				getServerOutput();
+				
+				sendAddressBook();
+
+				break;
+			case "query path":
+				// do stuff
+				sendToServer("QUERY PATH");
+				getServerOutput();
+				break;
+			case "query mutual":
+				// do stuff
+				sendToServer("QUERY MUTUAL");
+				getServerOutput();
+				break;
+			case "quit":
+				// saves addressbook and exits the program
+				finished = true;
+				break;
+			default:
+				System.out
+						.println("Please input one of the following: remove, "
+								+ "group, pull, push, query path, query mutual, quit");
+				break;
+			}
+		}
+
+	}
+
+	private void sendAddressBook() {
+
+	}
+
+	private void receiveAddressBook() {
+
+	}
+	
+
+	private void sendToServer(String output) throws IOException {
+		if (output != null) {
+			servWriter.write(output);
+		}
+		servWriter.flush();
+		socket.shutdownOutput();
+	}
+
+	private void getServerOutput() throws IOException {
+
+		String content = servReader.readLine();
+		while (content != null) {
+			userWriter.write(content + "\n");
+			content = servReader.readLine();
+		}
+		userWriter.flush();
+		socket.shutdownInput();
+		finished = false;
+		getUserInput();
 	}
 
 }

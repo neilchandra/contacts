@@ -1,102 +1,97 @@
 package contacts.server;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 
 import contacts.parser.ParsedAddressBook;
 
 public class Server {
-
-	/** The port on which to interact with the client */
-	private int PORT;
 	
-	/** The client socket */
+	private boolean finished;
+	private int port;
 	public Socket socket;
-	
-	/** The server Socket */
 	public ServerSocket serv;
-	
-	/**Buffered inputs and output */
-	private BufferedReader input;
-	private BufferedWriter writer;
+	private InputStream inputStream;
+	private OutputStream outputStream;
+	BufferedReader clientInput;
+	BufferedWriter clientWriter;
 	
 	/**The local copy of the address book*/
 	private ParsedAddressBook addressBook;
 	
-	public Server(int port) throws IOException {
-		port = PORT;
-		serv = new ServerSocket(PORT);
+	public Server(int _port) throws IOException {
+		port = _port;
+		serv = new ServerSocket(port);
+		finished = false;
 	}
 	
-	public void dialog() {
-		while(true){
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		try {
+			Server s = new Server(1818);
+			s.getClientInput();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+
+	}
+	
+	public void getClientInput() {
+		
+		while(!finished){
 			try {
-				Socket socket = serv.accept(); //connect with socket
-				input = new BufferedReader(new InputStreamReader(
+				socket = serv.accept(); //connect with socket
+				BufferedReader clientInput = new BufferedReader(new InputStreamReader(
 						socket.getInputStream()));
-				writer = new BufferedWriter(new OutputStreamWriter(
-						socket.getOutputStream()));
 
-				int content = input.read();
-				while (content != -1) {
-					//reactToUserCommand(content);
-					content = input.read();
-
+				String content = clientInput.readLine();
+				while (content != null) {
+					reactToClient(content, socket);
 				}
-				writer.flush();
+				clientWriter.flush();
 				socket.shutdownOutput();
 			} catch (IOException e) {
-				System.out.println("Server couldn't connect!");
+				//System.out.println("Server couldn't connect!");
 			}
 			
 		}
 	}
 	
-	
-	private void reactToUserCommand(String command) throws IOException {
-		command = command.toLowerCase();
-		switch(command) {
-			case "push" :
-				receiveAddressBook();
-				//do stuff
-				break;
+	private void sendToClient(String content, Socket socket) throws IOException {
+		clientWriter = new BufferedWriter(new OutputStreamWriter(
+				socket.getOutputStream()));
+		
+		if(content != null) {
+			clientWriter.write(content + " recieved");
+			clientWriter.flush();
+			socket.shutdownOutput();
+		}
+	}
+
+	private void reactToClient(String content, Socket socket) throws IOException {
+		
+		content = content.toLowerCase();
+		switch(content) {
 			case "pull" :
-				sendAddressBook();
-				//do stuff
+				sendToClient(content, socket);
+				break;
+			case "push" :
+				//do something
+				sendToClient(content, socket);
+				break;
+			case "query mutual":
+				sendToClient(content, socket);
+				//do something
 				break;
 			case "query path" :
-				//do stuff
-				break;
-			case "query mutual" :
-				//do stuff
-				break;
-			default :
-				//do nothing basically
+				sendToClient(content, socket);
+				//do something
 				break;
 		}
 		
-		//just echoes for now
-		writer.write(1);		
-	}
-	
-	private void sendAddressBook() {
-		//TODO: convert addressBook to XML and send line by line
-	}
-
-	private void receiveAddressBook() {
-		//TODO: receive addressbook line by line and covert to Addressbook
-		//then store as current addressbook
-	}
-	
-	
-	public static void main (String[] args) {
-		try {
-			Server s = new Server(10);
-			s.dialog();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 }
