@@ -7,10 +7,10 @@ import java.util.HashMap;
  */
 public class SubGroupList implements ParseNode, Group {
 
-	String groupName;
-	GroupHelper groupHelper;
-	SubGroupList subGroupList;
-	Boolean type1 = false;
+	private String groupName;
+	private GroupHelper groupHelper;
+	private SubGroupList subGroupList;
+	private Boolean type1 = false;
 	/**
 	 * Constructor
 	 * @param groupName
@@ -47,6 +47,10 @@ public class SubGroupList implements ParseNode, Group {
 			this.groupHelper.toXML(sb);
 		}
 	}
+	/**
+	 * adds all groups to a hash map
+	 * @param a hash map of strings to groups
+	 */
 	public void addAllGroups(HashMap<String, Group> stg) {
 		if(type1) {
 			stg.put(this.groupName, this);
@@ -101,6 +105,11 @@ public class SubGroupList implements ParseNode, Group {
 			return contacts;
 		}
 	}
+	/**
+	 * lists all contacts belonging to a groups
+	 * @param contacts an array of existing contacts
+	 * @return a list of contacts
+	 */
 	public ArrayList<Contact> listAllContacts(ArrayList<Contact> contacts) {
 		if(type1) {
 			if(this.groupHelper != null) {

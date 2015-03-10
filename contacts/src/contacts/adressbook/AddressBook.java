@@ -14,11 +14,11 @@ import contacts.server.Node;
  */
 public class AddressBook {
 	
-	HashMap<Integer, Contact> idToContact;
-	HashMap<String, Contact> nameToContact;
-	HashMap<String, Group> nameToGroup;
-	ArrayList<Integer> allContacts;
-	ParsedAddressBook pab;
+	private HashMap<Integer, Contact> idToContact;
+	private HashMap<String, Contact> nameToContact;
+	private HashMap<String, Group> nameToGroup;
+	private ArrayList<Integer> allContacts;
+	private ParsedAddressBook pab;
 	/**
 	 * Constructor
 	 * @param pab the parsed address book

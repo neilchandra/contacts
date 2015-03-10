@@ -5,7 +5,7 @@ package contacts.parser;
  */
 public class Name implements ParseNode {
 
-	String name;
+	private String name;
 	/**
 	 * constructor
 	 * @param name

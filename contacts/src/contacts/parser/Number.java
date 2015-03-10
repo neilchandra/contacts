@@ -5,7 +5,7 @@ package contacts.parser;
  */
 public class Number implements ParseNode {
 
-	String number;
+	private String number;
 	/**
 	 * constructor 
 	 * @param number
@@ -20,7 +20,10 @@ public class Number implements ParseNode {
 			sb.append(this.number);
 		
 	}
-
+	/**
+	 * returns the number
+	 * @return the number
+	 */
 	public String getNumber() {
 		return this.number;
 	}

@@ -7,13 +7,13 @@ import java.util.HashMap;
  * contact class
  */
 public class Contact implements ParseNode {
-	Name name;
-	Number number;
-	OwnID ownID;
-	Friends friends;
-	GroupHelper gh;
-	HashMap<Integer, Contact> idToFriends;
-	ArrayList<Integer> allFriends;
+	private Name name;
+	private Number number;
+	private OwnID ownID;
+	private Friends friends;
+	private GroupHelper gh;
+	private HashMap<Integer, Contact> idToFriends;
+	private ArrayList<Integer> allFriends;
 	/**
 	 * constructor for a contact
 	 * @param name
@@ -102,17 +102,27 @@ public class Contact implements ParseNode {
 	private boolean isFriendsWith(Integer i) {
 		return this.idToFriends.containsKey(i);
 	}
+	/**
+	 * adds this contact as a friend for all mutual contacts
+	 */
 	public void addMutualFriends() {
 		for(Integer i : this.allFriends) {
 			this.idToFriends.get(i).addFriend(this);
 		}
 	}
+	/**
+	 * adds contact as a friend
+	 * @param contact
+	 */
 	private void addFriend(Contact contact) {
 		int friendsID = contact.getID();
 		this.allFriends.add(friendsID);
 		this.idToFriends.put(friendsID, contact);
 		this.friends = new Friends(friendsID, this.friends);	
 	}
+	/**
+	 * deletes this contact from all friends
+	 */
 	public void delete() {
 		for(Integer i : this.allFriends) {
 			Contact myFriend = this.idToFriends.get(i);
@@ -120,6 +130,10 @@ public class Contact implements ParseNode {
 		}
 		this.gh.deleteContact();
 	}
+	/**
+	 * remove's contact from memory
+	 * @param i the id of the contact to be removed from memory
+	 */
 	private void removeContact(Integer i) {
 		this.idToFriends.remove(i);
 		this.allFriends.remove(this.allFriends.lastIndexOf(i));
@@ -129,7 +143,10 @@ public class Contact implements ParseNode {
 			this.friends.remove(i, null);
 		}
 	}
-
+	/**
+	 * returns an array list of all friends
+	 * @return an array list of all friends
+	 */
 	public ArrayList<Integer> getAllFriends() {
 		return this.allFriends;
 	}

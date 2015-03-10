@@ -33,7 +33,10 @@ public class TopGroupList implements ParseNode, Group {
 		if(this.topGroupList != null)
 			this.topGroupList.toXML(sb);
 	}
-	
+	/**
+	 * adds all groups
+	 * @param stg a hash map of strings to groups
+	 */
 	public void addAllGroups(HashMap<String, Group> stg) {
 		stg.put(groupName, this);
 		if(this.groupHelper != null)
@@ -41,7 +44,7 @@ public class TopGroupList implements ParseNode, Group {
 		if(this.topGroupList != null)
 			this.topGroupList.addAllGroups(stg);
 	}
-
+	@Override	
 	public ArrayList<Group> listGroups(ArrayList<Group> groups) {
 		groups.add(this);
 		if(this.topGroupList == null) {
@@ -71,6 +74,7 @@ public class TopGroupList implements ParseNode, Group {
 			return this.groupHelper.listContacts(contacts);
 		}
 	}
+	@Override
 	public void addGroup(String groupName, HashMap<String, Group> stg){
 		SubGroupList g = new SubGroupList(groupName, new GroupHelper(null), new SubGroupList(this.groupHelper));
 		GroupHelper newGroupHelper = new GroupHelper(g);

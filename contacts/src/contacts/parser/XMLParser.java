@@ -278,8 +278,10 @@ public class XMLParser {
 		ParsedAddressBook pab = parse("src/contacts/example.xml");
 		System.out.println(nameToContact);
 	}
-	public static Contact searchIdToContact(int friendsID) {
-		return idToContact.get(friendsID);
-	}
+	
+//	
+//	public static Contact searchIdToContact(int friendsID) {
+//		return idToContact.get(friendsID);
+//	}
 
 }

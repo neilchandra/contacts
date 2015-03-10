@@ -3,7 +3,7 @@ package contacts.parser;
  * class for OwnID
  */
 public class OwnID implements ParseNode {
-	int ID;
+	private int ID;
 	/**
 	 * constructor 
 	 * @param ID
@@ -15,6 +15,10 @@ public class OwnID implements ParseNode {
 	public void toXML(StringBuilder sb) {
 		sb.append(ID);
 	}
+	/**
+	 * returns the id
+	 * @return the id
+	 */
 	public Integer getID() {
 		return ID;
 	}

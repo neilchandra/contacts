@@ -9,10 +9,10 @@ import java.util.LinkedList;
  */
 public class GroupHelper implements ParseNode {
 	
-	SubGroupList subGroupList;
-	Contact contact;
-	GroupHelper groupHelper;
-	Boolean type1 = false;
+	private SubGroupList subGroupList;
+	private Contact contact;
+	private GroupHelper groupHelper;
+	private Boolean type1 = false;
 	/**
 	 * Constructor if containing subGroupList
 	 * @param subGroupList
@@ -44,8 +44,11 @@ public class GroupHelper implements ParseNode {
 			if(this.groupHelper != null)
 				this.groupHelper.toXML(sb);
 		}
-		
 	}
+	/**
+	 * adds all groups
+	 * @param groups a hash map of strings to groups
+	 */
 	public void addAllGroups(HashMap<String, Group> groups) {
 		if(type1 && this.subGroupList != null) {
 			this.subGroupList.addAllGroups(groups);
@@ -53,7 +56,11 @@ public class GroupHelper implements ParseNode {
 			this.groupHelper.addAllGroups(groups);
 		}	
 	}
-
+	/**
+	 * lists all sub groups
+	 * @param subGroups an array list of subgroups
+	 * @return an arraylist of subgroups
+	 */
 	public ArrayList<Group> listGroups(ArrayList<Group> subGroups) {
 		if(type1 && this.subGroupList != null) {
 			return this.subGroupList.listGroups(subGroups);
@@ -63,6 +70,11 @@ public class GroupHelper implements ParseNode {
 			return subGroups;
 		}
 	}
+	/**
+	 * provides a list of contacts
+	 * @param contacts a list of existing contacts
+	 * @return all contacts in the form of an arraylist
+	 */
 	public ArrayList<Contact> listContacts(ArrayList<Contact> contacts) {
 		if(this.subGroupList != null) {
 			return this.subGroupList.listAllContacts(contacts);
@@ -76,9 +88,16 @@ public class GroupHelper implements ParseNode {
 		}
 		return contacts;
 	}
+	/**
+	 * adds a contact
+	 * @param c the contact to be added
+	 */
 	public void addContact(Contact c) {
 		this.groupHelper = new GroupHelper(c, this.groupHelper);
 	}
+	/**
+	 * delets a contact
+	 */
 	public void deleteContact() {
 		this.type1 = true;
 		this.subGroupList = new SubGroupList(this.groupHelper);
