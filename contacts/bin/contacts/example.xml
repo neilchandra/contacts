@@ -6,52 +6,60 @@
 				<number>1800-204-smor</number>
 				<ownid>1</ownid>
 				<friends>
+					<id>6</id>
 				</friends>
 			</contact>
 			<contact>
 				<name>Mitchell</name>
 				<number>1800-204-smor</number>
-				<ownid>1</ownid>
+				<ownid>2</ownid>
 				<friends>
+					<id>6</id>
 				</friends>
 			</contact>
 			<contact>
 				<name>Sam</name>
 				<number>1800-204-smor</number>
-				<ownid>1</ownid>
+				<ownid>3</ownid>
 				<friends>
+					<id>6</id>
 				</friends>
 			</contact>
 		</group>
 		<contact>
 			<name>Jo</name>
 			<number>1800-204-smor</number>
-			<ownid>1</ownid>
+			<ownid>4</ownid>
 			<friends>
+				<id>6</id>
 			</friends>
 		</contact>
 		<group name="crew people">
 			<contact>
 				<name>Bayley</name>
 				<number>1800-204-1234</number>
-				<ownid>2</ownid>
+				<ownid>5</ownid>
 				<friends>
-					<id>0</id>
+					<id>6</id>
 				</friends>
 			</contact>
 			<contact>
 				<name>Luke</name>
 				<number>1800-204-1234</number>
-				<ownid>2</ownid>
+				<ownid>6</ownid>
 				<friends>
-					<id>0</id>
+					<id>1</id>
+					<id>2</id>
+					<id>3</id>
+					<id>4</id>
+					<id>5</id>
 				</friends>
 			</contact>
 			<group name="still on crew">
 				<contact>
 					<name>Dana</name>
 					<number>1800-204-smor</number>
-					<ownid>1</ownid>
+					<ownid>7</ownid>
 					<friends>
 					</friends>
 				</contact>
