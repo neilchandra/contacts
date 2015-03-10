@@ -122,5 +122,6 @@ public class SubGroupList implements ParseNode, Group {
 	@Override
 	public void addContact(Contact c) {
 		this.groupHelper = new GroupHelper(c, this.groupHelper);
+		c.setGroupHelper(this.groupHelper);
 	}
 }

@@ -33,6 +33,7 @@ public class Friends implements ParseNode {
 			HashMap<Integer, Contact> idToFriends) throws ImaginaryFriendException {
 		Contact myFriend = idToContact.get(this.friendsID);
 		if(myFriend == null)  {
+			System.out.println(this.friendsID);
 			throw new ImaginaryFriendException();
 		} else {
 			idToFriends.put(this.friendsID, myFriend);
@@ -46,6 +47,23 @@ public class Friends implements ParseNode {
 		if(this.friends != null) {
 			this.friends.addAllFriends(allFriends);
 		}
+	}
+	public void remove(Integer i, Friends superFriend) {
+		if(this.friendsID == i) {
+			superFriend.deleteNext();
+		} else {
+			this.friends.remove(i, this);
+		}
+	}
+	public void deleteNext() {
+		this.friends = this.friends.next();
+	}
+	public Friends next() {
+		return this.friends;
+	}
+	public int getID() {
+		return this.friendsID;
+		
 	}
 
 }

@@ -1,4 +1,4 @@
-package contacts.adressbook;
+package contacts.server;
 import java.util.Collection;
 
 import graph.*;

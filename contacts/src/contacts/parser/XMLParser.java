@@ -2,6 +2,7 @@ package contacts.parser;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -27,6 +28,23 @@ public class XMLParser {
 	public static ParsedAddressBook parse(String fileName) 
 			throws FileNotFoundException, ParseException {
 		t = new XMLTokenizer(new FileReader(fileName));
+		idToContact = new HashMap<Integer, Contact>();
+		nameToContact = new HashMap<String, Contact>();
+		nameToGroup = new HashMap<String, Group>();
+		allContacts = new ArrayList<Integer>();
+		t.advance();
+		return parseAddressBook();
+	}
+	/**
+	 * parse method when xml is a string
+	 * @param xml a string of xml
+	 * @return an address book
+	 * @throws FileNotFoundException
+	 * @throws ParseException
+	 */
+	public static ParsedAddressBook parseString(String xml) 
+			throws FileNotFoundException, ParseException {
+		t = new XMLTokenizer(new StringReader(xml));
 		idToContact = new HashMap<Integer, Contact>();
 		nameToContact = new HashMap<String, Contact>();
 		nameToGroup = new HashMap<String, Group>();
@@ -87,7 +105,11 @@ public class XMLParser {
 			throw new ParseException();
 		} else if (curr.kind == XMLConstants.OPENCONTACT) {
 			t.advance();
-			return new GroupHelper(parseContact(), parseGroupHelper());
+			Contact c = parseContact();
+			GroupHelper sgh = parseGroupHelper();
+			GroupHelper gh = new GroupHelper(c, sgh);
+			c.setGroupHelper(gh);
+			return gh;
 		} else {
 			return new GroupHelper(parseSubGroupList());
 		}

@@ -12,7 +12,6 @@ import contacts.parser.Number;
  */
 public class AddressBook {
 	
-	Graph g;
 	HashMap<Integer, Contact> idToContact;
 	HashMap<String, Contact> nameToContact;
 	HashMap<String, Group> nameToGroup;
@@ -52,6 +51,7 @@ public class AddressBook {
 	 */
 	public void addContact(Contact c, Group g) throws ImaginaryFriendException {
 		g.addContact(c);
+		this.allContacts.add(c.getID());
 		nameToContact.put(c.getName(), c);
 		idToContact.put(c.getID(), c);
 		c.addFriendsToContact(this.idToContact);
@@ -142,11 +142,16 @@ public class AddressBook {
 		superGroup.addGroup(groupName, this.nameToGroup);
 	}
 	
-	public void setGraph() {
-		for(int i : this.allContacts) {
-			Contact c = this.idToContact.get(i);
-			
+	public void removeContact(String contactName) throws ImaginaryFriendException {
+		Contact c = this.nameToContact.get(contactName);
+		if(c == null) {
+			throw new ImaginaryFriendException();
 		}
+		c.delete();
+		int id = c.getID();
+		this.idToContact.remove(id);
+		this.nameToContact.remove(contactName);
+		this.allContacts.remove(this.allContacts.lastIndexOf(c.getID()));
 	}
 	/** 
 	 * main method for testing
@@ -168,5 +173,11 @@ public class AddressBook {
 		ab.addContact(neil, ab.nameToGroup.get("third floor"));
 		ab.printAdressBook();
 		System.out.println(ab.toXML());
+		ab.removeContact("Ally");
+		ab.removeContact("neil");
+		System.out.println(ab.toXML());
+		ParsedAddressBook pab2 = XMLParser.parseString(ab.toXML());
+		AddressBook ab2 = new AddressBook(pab2);
+		System.out.println(ab2.toXML());
 	}
 }

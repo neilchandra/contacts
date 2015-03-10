@@ -3,7 +3,6 @@ package contacts.parser;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 /**
  * contact class
  */
@@ -12,6 +11,7 @@ public class Contact implements ParseNode {
 	Number number;
 	OwnID ownID;
 	Friends friends;
+	GroupHelper gh;
 	HashMap<Integer, Contact> idToFriends;
 	ArrayList<Integer> allFriends;
 	/**
@@ -27,6 +27,10 @@ public class Contact implements ParseNode {
 		this.number = number;
 		this.ownID = ownID;
 		this.friends = friends;
+	}
+	
+	public void setGroupHelper(GroupHelper gh){
+		this.gh = gh;
 	}
 	@Override
 	public void toXML(StringBuilder sb) {
@@ -84,5 +88,21 @@ public class Contact implements ParseNode {
 		this.allFriends.add(friendsID);
 		this.idToFriends.put(friendsID, contact);
 		this.friends = new Friends(friendsID, this.friends);	
+	}
+	public void delete() {
+		for(Integer i : this.allFriends) {
+			Contact myFriend = this.idToFriends.get(i);
+			myFriend.removeContact(getID());
+		}
+		this.gh.deleteContact();
+	}
+	private void removeContact(Integer i) {
+		this.idToFriends.remove(i);
+		this.allFriends.remove(this.allFriends.lastIndexOf(i));
+		if(this.friends.getID() == i) {
+			this.friends = this.friends.next();
+		} else {
+			this.friends.remove(i, null);
+		}
 	}
 }

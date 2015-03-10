@@ -79,4 +79,8 @@ public class GroupHelper implements ParseNode {
 	public void addContact(Contact c) {
 		this.groupHelper = new GroupHelper(c, this.groupHelper);
 	}
+	public void deleteContact() {
+		this.type1 = true;
+		this.subGroupList = new SubGroupList(this.groupHelper);
+	}
 }
