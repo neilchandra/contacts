@@ -269,14 +269,200 @@ public class XMLParser {
 		return new Friends(friendsID, parseFriends());
 	}
 	/**
+	 * test cases
+	 */
+	private static void testXMLParser() {
+		System.out.println("======= parsing the example =======");
+		// parsing the given example works
+		try {
+			parse("src/contacts/example.xml");
+			// this code should be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// unreachable code
+			System.out.println(false);
+		}
+		// parsing the given example is not null 
+		try {
+			System.out.println(parse("src/contacts/example.xml") != null);
+		} catch (Exception e) {
+			// unreachable code
+			System.out.println(false);
+		}
+		System.out.println("======= testing invalid starting keywords =======");
+		try {
+			parseString("addressBook endAddressBook");
+			// this code should not be reachable
+			System.out.println(false);
+		} catch (Exception e) {
+			// should be reachable code
+			System.out.println(true);
+		}
+		try {
+			parseString("group endGroup");
+			// this code should not be reachable
+			System.out.println(false);
+		} catch (Exception e) {
+			// should be reachable code
+			System.out.println(true);
+		}
+		System.out.println("======= parsing the empty addressbook =======");
+		try {
+			parseString("<addressBook> </addressBook>");
+			// this code should be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+		System.out.println("======= parsing one topgroup =======");
+		try {
+			parseString("<addressBook><group name=\"group 1\"> </group></addressBook>");
+			// this code should be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+		System.out.println("======= parsing multiple topgroups =======");
+		try {
+			parseString("<addressBook><group name=\"group 1\"> </group> "
+					+ "<group name=\"group 2\"> </group> </addressBook>");
+			// this code should be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+		try {
+			parseString("<addressBook><group name=\"group 1\"> </group> "
+					+ "<group name=\"group 2\"> </group>"
+					+ "<group name=\"group 3\"> </group> </addressBook>");
+			// this code should be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+		System.out.println("======= parsing subgroups =======");
+		try {
+			parseString("<addressBook><group name=\"group 1\">"
+					+ "<group name=\"subgroup1\"> </group></group></addressBook>");
+			// this code should be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+		System.out.println("======= parsing subgroups of subgroups =======");
+		try {
+			parseString("<addressBook><group name=\"group 1\">"
+					+ "<group name=\"subgroup1\">"
+					+ "<group name=\"subsubgroup1\"> </group></group></group></addressBook>");
+			// this code should be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+		System.out.println("======= parsing contacts with no id =======");
+		// should print out an error message
+		try {
+			parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid></ownid>"
+					+ "<friends></friends></contact></group></addressBook>");
+			// this code should not be reachable
+			System.out.println(false);
+		} catch (Exception e) {
+			// should be reachable code
+			System.out.println(true);
+		}
+		System.out.println("======= parsing contacts with non number id =======");
+		// should print out an error message
+		try {
+			parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid>not a number</ownid>"
+					+ "<friends></friends></contact></group></addressBook>");
+			// this code should not be reachable
+			System.out.println(false);
+		} catch (Exception e) {
+			// should be reachable code
+			System.out.println(true);
+		}
+		System.out.println("======= parsing contacts with no friends =======");
+		// should print out an error message
+		try {
+			parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends></friends></contact></group></addressBook>");
+			// this code should  be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+		System.out.println("======= parsing contacts with 1 or more friends =======");
+		// should print out an error message
+		try {
+			parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends><id>2</id></friends></contact></group></addressBook>");
+			// this code should  be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+		// should print out an error message
+		try {
+			parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends><id>2</id><id>3</id><id>4</id></friends>"
+					+ "</contact></group></addressBook>");
+			// this code should  be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+		System.out.println("======= parsing multiple contacts =======");
+		// should print out an error message
+		try {
+			parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends><id>2</id></friends></contact>"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends><id>2</id></friends></contact></group></addressBook>");
+			// this code should  be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+		System.out.println("======= parsing multiple contacts inside and outside subgroups =======");
+		// should print out an error message
+		try {
+			parseString("<addressBook><group name=\"group 1\">"
+					+ "<group name=\"subgroup 1\">"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends><id>2</id></friends></contact></group>"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends><id>2</id></friends></contact></group></addressBook>");
+			// this code should  be reachable
+			System.out.println(true);
+		} catch (Exception e) {
+			// should not be reachable code
+			System.out.println(false);
+		}
+	}
+	/**
 	 * main method
 	 * @param the name of the file containing the xml file
 	 * @throws FileNotFoundException
 	 * @throws ParseException
 	 */
 	public static void main(String[] args) throws FileNotFoundException, ParseException {
-		ParsedAddressBook pab = parse("src/contacts/example.xml");
-		System.out.println(nameToContact);
+		testXMLParser();
 	}
 	
 //	
