@@ -3,7 +3,12 @@ package contacts.server;
 import java.io.*;
 import java.net.*;
 
+import contacts.adressbook.*;
+import contacts.parser.ImaginaryFriendException;
+import contacts.parser.ParseException;
 import contacts.parser.ParsedAddressBook;
+import contacts.parser.ThisIsntMutualException;
+import contacts.parser.XMLParser;
 
 public class Server {
 	
@@ -17,27 +22,17 @@ public class Server {
 	BufferedWriter clientWriter;
 	
 	/**The local copy of the address book*/
-	private ParsedAddressBook addressBook;
+	private AddressBook addressBook;
 	
-	public Server(int _port) throws IOException {
+	public Server(int _port) throws IOException, ParseException, ImaginaryFriendException, ThisIsntMutualException {
+		ParsedAddressBook pab = XMLParser.parse("src/contacts/example.xml");
+		addressBook = new AddressBook(pab);
+		
 		port = _port;
 		serv = new ServerSocket(port);
 		finished = false;
 	}
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			Server s = new Server(1818);
-			s.getClientInput();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-
-	}
 	
 	public void getClientInput() {
 		
@@ -76,7 +71,7 @@ public class Server {
 		content = content.toLowerCase();
 		switch(content) {
 			case "pull" :
-				sendToClient(content, socket);
+				sendToClient(addressBook.toXML(), socket);
 				break;
 			case "push" :
 				//do something
@@ -92,6 +87,24 @@ public class Server {
 				break;
 		}
 		
+	}
+	
+	
+	/**
+	 * @param args
+	 * @throws ThisIsntMutualException 
+	 * @throws ImaginaryFriendException 
+	 * @throws ParseException 
+	 */
+	public static void main(String[] args) throws ParseException, ImaginaryFriendException, ThisIsntMutualException {
+		try {
+			Server s = new Server(1818);
+			s.getClientInput();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+
 	}
 
 }
