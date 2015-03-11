@@ -60,6 +60,20 @@ public class AddressBook {
 		c.addMutualFriends();
 	}
 	/**
+	 * Adds a contact to a group with groupName g
+	 * @param c a contact
+	 * @param g the name of a group
+	 * @throws ImaginaryFriendException 
+	 */
+	public void addContact(Contact c, String g) throws ImaginaryFriendException {
+		this.nameToGroup.get(g).addContact(c);
+		this.allContacts.add(c.getID());
+		nameToContact.put(c.getName(), c);
+		idToContact.put(c.getID(), c);
+		c.addFriendsToContact(this.idToContact);
+		c.addMutualFriends();
+	}
+	/**
 	 * lists all the contacts in the group g
 	 * @param g the group
 	 * @return an arraylist of all contacts in a group
@@ -170,6 +184,15 @@ public class AddressBook {
 	 */
 	public void addGroup(String groupName, Group superGroup) {
 		superGroup.addGroup(groupName, this.nameToGroup);
+	}
+	
+	/**
+	 * adds a group as a subgroup of a supergroup
+	 * @param groupName the name of the group
+	 * @param superGroup the name of the supergroup
+	 */
+	public void addGroup(String groupName, String superGroup) {
+		this.nameToGroup.get(superGroup).addGroup(groupName, this.nameToGroup);
 	}
 	/**
 	 * removes a contact 
@@ -290,12 +313,50 @@ public class AddressBook {
 				"<addressBook><group name=\"RISD\"></group>"
 				+ "<group name=\"Brown\"></group></addressBook>"));
 		System.out.println("========== adding subgroups ==========");
-		ab.addGroup("CS TAs", ab.nameToGroup.get("Brown"));
-		ab.addGroup("awesome TAs", ab.nameToGroup.get("CS TAs"));
+		ab.addGroup("CS TAs", "Brown");
+		ab.addGroup("CS16 TAs", "CS TAs");
 		System.out.println(ab.toXML().equals(
 				"<addressBook><group name=\"RISD\"></group><group name=\"Brown\"><group "
-				+ "name=\"CS TAs\"><group name=\"awesome TAs\"></group></group>"
+				+ "name=\"CS TAs\"><group name=\"CS16 TAs\"></group></group>"
 				+ "</group></addressBook>"));
+		ab.addGroup("CS18 TAs", "CS TAs");
+		System.out.println(ab.toXML().equals(
+				"<addressBook><group name=\"RISD\"></group><group name=\"Brown\">"
+				+ "<group name=\"CS TAs\"><group name=\"CS18 TAs\">"
+				+ "</group><group name=\"CS16 TAs\"></group></group>"
+				+ "</group></addressBook>"));
+		System.out.println("========== adding contacts to a subgroup ==========");
+		try {
+			ab.addContact(ab.makeContact("random TA", "401", 3, new int[0]), "CS18 TAs");
+			// this code should be reachable
+			System.out.println(true);
+		} catch (ImaginaryFriendException e) {
+			System.out.println(false);
+		}
+		System.out.println(ab.toXML().equals(
+				"<addressBook><group name=\"RISD\"></group><group name=\"Brown\">"
+				+ "<group name=\"CS TAs\"><group name=\"CS18 TAs\">"
+				+ "<contact><name>random TA</name><number>401</number><ownid>3</ownid>"
+				+ "<friends></friends></contact></group>"
+				+ "<group name=\"CS16 TAs\"></group></group></group></addressBook>"));
+		System.out.println("========== adding groups to groups with contacts in them ==========");
+		ab.addGroup("awesome TAs", "CS18 TAs");
+		try {
+			ab.addContact(ab.makeContact("Zach", "99", 64, new int[0]), "awesome TAs");
+			// code should be reached
+			System.out.println(true);
+		} catch (ImaginaryFriendException e) {
+			// code should not be reached
+			System.out.println(false);
+		}
+		System.out.println(ab.toXML().equals(
+				"<addressBook><group name=\"RISD\"></group><group name=\"Brown\">"
+				+ "<group name=\"CS TAs\"><group name=\"CS18 TAs\">"
+				+ "<group name=\"awesome TAs\"><contact><name>Zach</name>"
+				+ "<number>99</number><ownid>64</ownid><friends></friends></contact>"
+				+ "</group><contact><name>random TA</name><number>401</number>"
+				+ "<ownid>3</ownid><friends></friends></contact></group>"
+				+ "<group name=\"CS16 TAs\"></group></group></group></addressBook>"));
 	}
 	/** 
 	 * main method for testing

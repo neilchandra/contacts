@@ -125,9 +125,9 @@ public class SubGroupList implements ParseNode, Group {
 	}
 	@Override
 	public void addGroup(String groupName, HashMap<String, Group> stg) {
-		this.groupHelper = new GroupHelper(new SubGroupList
-				(groupName, new GroupHelper(null), null));
-		stg.put(groupName, this.subGroupList);		
+		SubGroupList sgl = new SubGroupList(groupName, new GroupHelper(null), new SubGroupList(this.groupHelper));
+		this.groupHelper = new GroupHelper(sgl);
+		stg.put(groupName, sgl);
 	}
 	@Override
 	public void addContact(Contact c) {
