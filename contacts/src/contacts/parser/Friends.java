@@ -38,6 +38,11 @@ public class Friends implements ParseNode {
 	public void addFriendsToContact(HashMap<Integer, Contact> idToContact,
 			HashMap<Integer, Contact> idToFriends) throws ImaginaryFriendException {
 		if(!idToContact.containsKey(this.friendsID)) {
+			System.out.println("can't have imaginary friends");
+			throw new ImaginaryFriendException();
+		}
+		if(idToFriends.containsKey(this.friendsID)) {
+			System.out.println("Can't have duplicate friends");
 			throw new ImaginaryFriendException();
 		}
 		Contact myFriend = idToContact.get(this.friendsID);

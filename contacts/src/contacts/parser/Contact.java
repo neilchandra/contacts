@@ -88,8 +88,11 @@ public class Contact implements ParseNode {
 	public void checkIfMutual() throws ThisIsntMutualException {
 		for(Integer i : this.allFriends) {
 			if(!this.idToFriends.get(i).isFriendsWith(getID())) {
-				System.out.println(getName());
-				System.out.println(idToFriends.get(i).getName());
+				System.out.println("friendship is not mutual");
+				throw new ThisIsntMutualException();
+			}
+			if(i == this.getID()) {
+				System.out.println("Can't be friends with yourself!");
 				throw new ThisIsntMutualException();
 			}
 		}

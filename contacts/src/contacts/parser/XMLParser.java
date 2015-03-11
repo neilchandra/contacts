@@ -12,20 +12,23 @@ import contacts.adressbook.*;
  * class where xml file is parsed
  */
 public class XMLParser {
-	
+
 	private static XMLTokenizer t;
 	static HashMap<Integer, Contact> idToContact;
 	static HashMap<String, Contact> nameToContact;
 	static HashMap<String, Group> nameToGroup;
 	static ArrayList<Integer> allContacts;
+
 	/**
 	 * parse method
-	 * @param fileName the name of the xml file containing the address book
+	 * 
+	 * @param fileName
+	 *            the name of the xml file containing the address book
 	 * @return an address book
 	 * @throws FileNotFoundException
 	 * @throws ParseException
 	 */
-	public static ParsedAddressBook parse(String fileName) 
+	public static ParsedAddressBook parse(String fileName)
 			throws FileNotFoundException, ParseException {
 		t = new XMLTokenizer(new FileReader(fileName));
 		idToContact = new HashMap<Integer, Contact>();
@@ -35,14 +38,17 @@ public class XMLParser {
 		t.advance();
 		return parseAddressBook();
 	}
+
 	/**
 	 * parse method when xml is a string
-	 * @param xml a string of xml
+	 * 
+	 * @param xml
+	 *            a string of xml
 	 * @return an address book
 	 * @throws FileNotFoundException
 	 * @throws ParseException
 	 */
-	public static ParsedAddressBook parseString(String xml) 
+	public static ParsedAddressBook parseString(String xml)
 			throws ParseException {
 		t = new XMLTokenizer(new StringReader(xml));
 		idToContact = new HashMap<Integer, Contact>();
@@ -52,14 +58,16 @@ public class XMLParser {
 		t.advance();
 		return parseAddressBook();
 	}
+
 	/**
 	 * method to parse the begining of the address book
+	 * 
 	 * @return the address book
 	 * @throws ParseException
 	 */
-	private static ParsedAddressBook parseAddressBook() throws ParseException  {
+	private static ParsedAddressBook parseAddressBook() throws ParseException {
 		Token curr = t.current();
-		if(curr != null && curr.kind == XMLConstants.OPENADDRESSBOOK){
+		if (curr != null && curr.kind == XMLConstants.OPENADDRESSBOOK) {
 			t.advance();
 			ParsedAddressBook ab = new ParsedAddressBook(parseTopGroupList());
 			ab.setNameToContact(nameToContact);
@@ -71,37 +79,45 @@ public class XMLParser {
 			throw new ParseException();
 		}
 	}
+
 	/**
 	 * method to parse the top group list
+	 * 
 	 * @return a top group list
 	 * @throws ParseException
 	 */
-	private static TopGroupList parseTopGroupList() throws ParseException  {
+	private static TopGroupList parseTopGroupList() throws ParseException {
 		Token curr = t.current();
 		String groupName = "";
-		if(curr == null) {
+		if (curr == null) {
 			throw new ParseException();
-		} else if(curr.kind == XMLConstants.CLOSEADDRESSBOOK) {
+		} else if (curr.kind == XMLConstants.CLOSEADDRESSBOOK) {
 			return null;
-		} else if(curr.kind == XMLConstants.OPENGROUP) {
+		} else if (curr.kind == XMLConstants.OPENGROUP) {
 			groupName = t.current().attribute;
 			t.advance();
-			TopGroupList topGroupList = 
-					new TopGroupList(groupName, parseGroupHelper(), parseTopGroupList());
+			TopGroupList topGroupList = new TopGroupList(groupName,
+					parseGroupHelper(), parseTopGroupList());
+			if (nameToGroup.containsKey(topGroupList.getName())) {
+				System.out.println("Group names must be unique");
+				throw new ParseException();
+			}
 			nameToGroup.put(groupName, topGroupList);
 			return topGroupList;
 		} else {
 			throw new ParseException();
 		}
 	}
+
 	/**
-	 * helper method to parse groups				 
+	 * helper method to parse groups
+	 * 
 	 * @return group helper
 	 * @throws ParseException
 	 */
 	private static GroupHelper parseGroupHelper() throws ParseException {
 		Token curr = t.current();
-		if(curr == null) {
+		if (curr == null) {
 			throw new ParseException();
 		} else if (curr.kind == XMLConstants.OPENCONTACT) {
 			t.advance();
@@ -114,42 +130,52 @@ public class XMLParser {
 			return new GroupHelper(parseSubGroupList());
 		}
 	}
+
 	/**
 	 * method to parse sub group lists
+	 * 
 	 * @return a sub group list
 	 * @throws ParseException
 	 */
-	private static SubGroupList parseSubGroupList() throws ParseException  {
+	private static SubGroupList parseSubGroupList() throws ParseException {
 		Token curr = t.current();
 		String groupName = "";
-		if(curr == null){
+		if (curr == null) {
 			throw new ParseException();
-		} 
-		if(curr.kind == XMLConstants.CLOSEGROUP) {
+		}
+		if (curr.kind == XMLConstants.CLOSEGROUP) {
 			t.advance();
 			return null;
 		} else if (curr.kind == XMLConstants.OPENGROUP) {
 			groupName = t.current().attribute;
 			t.advance();
-			return new SubGroupList(groupName, parseGroupHelper(), parseSubGroupList());
+			SubGroupList sg = new SubGroupList(groupName, parseGroupHelper(),
+					parseSubGroupList());
+			if (nameToGroup.containsKey(sg.getName())) {
+				System.out.println("Group names must be unique");
+				throw new ParseException();
+			}
+			return sg;
 		} else {
 			return new SubGroupList(parseGroupHelper());
 		}
 	}
+
 	/**
 	 * method to parse a contact
+	 * 
 	 * @return a contact
-	 * @throws ParseException 
-	 * @throws ImaginaryFriendException 
+	 * @throws ParseException
+	 * @throws ImaginaryFriendException
 	 */
 	private static Contact parseContact() throws ParseException {
 		Name name = parseName();
 		Number number = parseNumber();
 		OwnID ownID = parseOwnId();
 		Token curr = t.current();
-		if(curr.kind == XMLConstants.OPENFRIENDS){
+		if (curr.kind == XMLConstants.OPENFRIENDS) {
 			t.advance();
-			Contact contact =  new Contact(name, number, ownID, parseFriends());
+			Contact contact = new Contact(name, number, ownID, parseFriends());
 			idToContact.put(ownID.getID(), contact);
 			nameToContact.put(name.toString(), contact);
 			allContacts.add(ownID.getID());
@@ -158,8 +184,10 @@ public class XMLParser {
 			throw new ParseException();
 		}
 	}
+
 	/**
 	 * method to parse a name
+	 * 
 	 * @return Name
 	 * @throws ParseException
 	 */
@@ -181,8 +209,10 @@ public class XMLParser {
 		}
 		return new Name(name);
 	}
+
 	/**
 	 * method parse a Number
+	 * 
 	 * @return Number
 	 * @throws ParseException
 	 */
@@ -204,8 +234,10 @@ public class XMLParser {
 		}
 		return new Number(number);
 	}
+
 	/**
 	 * method to parse own ID
+	 * 
 	 * @return OwnID
 	 * @throws ParseException
 	 */
@@ -217,7 +249,15 @@ public class XMLParser {
 			throw new ParseException();
 		}
 		if (t.current() != null && t.current().kind == XMLConstants.TEXT) {
-			number = Integer.parseInt(t.current().attribute);
+			try {
+				number = Integer.parseInt(t.current().attribute);
+			} catch (NumberFormatException e) {
+				throw new ParseException();
+			}
+			if (idToContact.containsKey(number)) {
+				System.out.println("IDs must be unique");
+				throw new ParseException();
+			}
 			t.advance();
 		} else {
 			System.out.println("Must have an ID!");
@@ -230,20 +270,23 @@ public class XMLParser {
 		}
 		return new OwnID(number);
 	}
+
 	/**
 	 * method to parse friends
+	 * 
 	 * @return Friends
 	 * @throws ParseException
 	 */
 	private static Friends parseFriends() throws ParseException {
 		int friendsID;
 		Token curr = t.current();
-		if(curr == null) {
+		if (curr == null) {
 			throw new ParseException();
 		}
 		if (curr.kind == XMLConstants.CLOSEFRIENDS) {
 			t.advance();
-			if(t.current() != null && t.current().kind == XMLConstants.CLOSECONTACT){
+			if (t.current() != null
+					&& t.current().kind == XMLConstants.CLOSECONTACT) {
 				t.advance();
 				return null;
 			} else {
@@ -255,7 +298,11 @@ public class XMLParser {
 			throw new ParseException();
 		}
 		if (t.current() != null && t.current().kind == XMLConstants.TEXT) {
-			friendsID = Integer.parseInt(t.current().attribute);
+			try {
+				friendsID = Integer.parseInt(t.current().attribute);
+			} catch (NumberFormatException e) {
+				throw new ParseException();
+			}
 			t.advance();
 		} else {
 			System.out.println("Friends must have an ID!");
@@ -268,6 +315,7 @@ public class XMLParser {
 		}
 		return new Friends(friendsID, parseFriends());
 	}
+
 	/**
 	 * test cases
 	 */
@@ -282,7 +330,7 @@ public class XMLParser {
 			// unreachable code
 			System.out.println(false);
 		}
-		// parsing the given example is not null 
+		// parsing the given example is not null
 		try {
 			System.out.println(parse("src/contacts/example.xml") != null);
 		} catch (Exception e) {
@@ -377,7 +425,8 @@ public class XMLParser {
 			// should be reachable code
 			System.out.println(true);
 		}
-		System.out.println("======= parsing contacts with non number id =======");
+		System.out
+				.println("======= parsing contacts with non number id =======");
 		// should print out an error message
 		try {
 			parseString("<addressBook><group name=\"group 1\">"
@@ -395,19 +444,20 @@ public class XMLParser {
 			parseString("<addressBook><group name=\"group 1\">"
 					+ "<contact><name></name><number></number><ownid>1</ownid>"
 					+ "<friends></friends></contact></group></addressBook>");
-			// this code should  be reachable
+			// this code should be reachable
 			System.out.println(true);
 		} catch (Exception e) {
 			// should not be reachable code
 			System.out.println(false);
 		}
-		System.out.println("======= parsing contacts with 1 or more friends =======");
+		System.out
+				.println("======= parsing contacts with 1 or more friends =======");
 		// should print out an error message
 		try {
 			parseString("<addressBook><group name=\"group 1\">"
 					+ "<contact><name></name><number></number><ownid>1</ownid>"
 					+ "<friends><id>2</id></friends></contact></group></addressBook>");
-			// this code should  be reachable
+			// this code should be reachable
 			System.out.println(true);
 		} catch (Exception e) {
 			// should not be reachable code
@@ -419,55 +469,76 @@ public class XMLParser {
 					+ "<contact><name></name><number></number><ownid>1</ownid>"
 					+ "<friends><id>2</id><id>3</id><id>4</id></friends>"
 					+ "</contact></group></addressBook>");
-			// this code should  be reachable
+			// this code should be reachable
 			System.out.println(true);
 		} catch (Exception e) {
 			// should not be reachable code
 			System.out.println(false);
 		}
-		System.out.println("======= parsing multiple contacts =======");
-		// should print out an error message
+		System.out
+				.println("======= parsing multiple contacts with the same ownid =======");
+		// should print out an error message as the contacts have the same ownid
 		try {
 			parseString("<addressBook><group name=\"group 1\">"
 					+ "<contact><name></name><number></number><ownid>1</ownid>"
 					+ "<friends><id>2</id></friends></contact>"
 					+ "<contact><name></name><number></number><ownid>1</ownid>"
 					+ "<friends><id>2</id></friends></contact></group></addressBook>");
-			// this code should  be reachable
+			// this code should not be reachable
+			System.out.println(false);
+		} catch (Exception e) {
+			// should be reachable code
+			System.out.println(true);
+		}
+		System.out.println("======= parsing multiple contacts =======");
+		// should print out an error message as the contacts have the same ownid
+		try {
+			parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends><id>1</id></friends></contact>"
+					+ "<contact><name></name><number></number><ownid>2</ownid>"
+					+ "<friends><id>2</id></friends></contact></group></addressBook>");
+			// this code should be reachable
 			System.out.println(true);
 		} catch (Exception e) {
-			// should not be reachable code
+			// should be reachable code
 			System.out.println(false);
 		}
-		System.out.println("======= parsing multiple contacts inside and outside subgroups =======");
+		System.out
+				.println("======= parsing multiple contacts inside and outside subgroups =======");
 		// should print out an error message
 		try {
 			parseString("<addressBook><group name=\"group 1\">"
 					+ "<group name=\"subgroup 1\">"
-					+ "<contact><name></name><number></number><ownid>1</ownid>"
-					+ "<friends><id>2</id></friends></contact></group>"
+					+ "<contact><name></name><number></number><ownid>2</ownid>"
+					+ "<friends><id>1</id></friends></contact></group>"
 					+ "<contact><name></name><number></number><ownid>1</ownid>"
 					+ "<friends><id>2</id></friends></contact></group></addressBook>");
-			// this code should  be reachable
+			// this code should be reachable
 			System.out.println(true);
 		} catch (Exception e) {
 			// should not be reachable code
 			System.out.println(false);
 		}
+		
 	}
+
 	/**
 	 * main method
-	 * @param the name of the file containing the xml file
+	 * 
+	 * @param the
+	 *            name of the file containing the xml file
 	 * @throws FileNotFoundException
 	 * @throws ParseException
 	 */
-	public static void main(String[] args) throws FileNotFoundException, ParseException {
+	public static void main(String[] args) throws FileNotFoundException,
+			ParseException {
 		testXMLParser();
 	}
-	
-//	
-//	public static Contact searchIdToContact(int friendsID) {
-//		return idToContact.get(friendsID);
-//	}
+
+	//
+	// public static Contact searchIdToContact(int friendsID) {
+	// return idToContact.get(friendsID);
+	// }
 
 }

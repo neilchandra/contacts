@@ -72,8 +72,11 @@ public class AddressBook {
 	 * @param g
 	 *            the name of a group
 	 * @throws ImaginaryFriendException
+	 * @throws ThisIsntMutualException
 	 */
-	public void addContact(Contact c, String g) throws ImaginaryFriendException {
+	public void addContact(Contact c, String g)
+			throws ImaginaryFriendException, ThisIsntMutualException {
+		c.checkIfMutual();
 		this.nameToGroup.get(g).addContact(c);
 		this.allContacts.add(c.getID());
 		nameToContact.put(c.getName(), c);
@@ -139,13 +142,22 @@ public class AddressBook {
 	 * @param friendsID
 	 *            array of friends id
 	 * @return a contact
+	 * @throws ParseException
+	 * @throws ImaginaryFriendException 
 	 */
-	public Contact makeContact(String name, String num, int id, int[] friendsID) {
+	public Contact makeContact(String name, String num, int id, int[] friendsID)
+			throws ParseException, ImaginaryFriendException {
+		if (this.idToContact.containsKey(id)) {
+			System.out.println("IDs must be unique");
+			throw new ParseException();
+		}
 		Name theName = new Name(name);
 		Number theNum = new Number(num);
 		OwnID ownID = new OwnID(id);
 		Friends f = makeFriends(friendsID, 0);
-		return new Contact(theName, theNum, ownID, f);
+		Contact c = new Contact(theName, theNum, ownID, f);
+		c.addFriendsToContact(this.idToContact);
+		return c;
 	}
 
 	/**
@@ -210,8 +222,13 @@ public class AddressBook {
 	 * 
 	 * @param groupName
 	 *            the name of the group
+	 * @throws ParseException
 	 */
-	public void addGroup(String groupName) {
+	public void addGroup(String groupName) throws ParseException {
+		if (this.nameToGroup.containsKey(groupName)) {
+			System.out.println("group names must be unique");
+			throw new ParseException();
+		}
 		pab.addTopGroup(groupName, this.nameToGroup);
 	}
 
@@ -222,8 +239,18 @@ public class AddressBook {
 	 *            the name of the group
 	 * @param superGroup
 	 *            the name of the supergroup
+	 * @throws ParseException
 	 */
-	public void addGroup(String groupName, String superGroup) {
+	public void addGroup(String groupName, String superGroup)
+			throws ParseException {
+		if (this.nameToGroup.containsKey(groupName)) {
+			System.out.println("group names must be unique");
+			throw new ParseException();
+		}
+		if (!this.nameToGroup.containsKey(superGroup)) {
+			System.out.println("referenced group does not exist");
+			throw new ParseException();
+		}
 		this.nameToGroup.get(superGroup).addGroup(groupName, this.nameToGroup);
 	}
 
@@ -307,10 +334,18 @@ public class AddressBook {
 			// code should be unreachable
 		}
 		System.out.println("========== adding top groups ==========");
-		ab.addGroup("Brown");
+		try {
+			ab.addGroup("Brown");
+		} catch (ParseException e2) {
+			System.out.println(false);
+		}
 		System.out.println(ab.toXML().equals(
 				"<addressBook><group name=\"Brown\"></group></addressBook>"));
-		ab.addGroup("RISD");
+		try {
+			ab.addGroup("RISD");
+		} catch (ParseException e2) {
+			System.out.println(false);
+		}
 		System.out.println(ab.toXML().equals(
 				"<addressBook><group name=\"RISD\"></group>"
 						+ "<group name=\"Brown\"></group></addressBook>"));
@@ -323,7 +358,7 @@ public class AddressBook {
 					"Brown");
 			// should be reachable code
 			System.out.println(true);
-		} catch (ImaginaryFriendException e1) {
+		} catch (ImaginaryFriendException | ParseException | ThisIsntMutualException e1) {
 			// should be unreachable code
 			System.out.println(false);
 		}
@@ -332,7 +367,7 @@ public class AddressBook {
 					"RISD");
 			// should be reachable code
 			System.out.println(true);
-		} catch (ImaginaryFriendException e) {
+		} catch (ImaginaryFriendException | ParseException | ThisIsntMutualException e) {
 			// should be unreachable code
 			System.out.println(false);
 		}
@@ -362,15 +397,23 @@ public class AddressBook {
 				"<addressBook><group name=\"RISD\"></group>"
 						+ "<group name=\"Brown\"></group></addressBook>"));
 		System.out.println("========== adding subgroups ==========");
-		ab.addGroup("CS TAs", "Brown");
-		ab.addGroup("CS16 TAs", "CS TAs");
+		try {
+			ab.addGroup("CS TAs", "Brown");
+			ab.addGroup("CS16 TAs", "CS TAs");
+		} catch (ParseException e1) {
+			System.out.println(false);
+		}
 		System.out
 				.println(ab
 						.toXML()
 						.equals("<addressBook><group name=\"RISD\"></group><group name=\"Brown\"><group "
 								+ "name=\"CS TAs\"><group name=\"CS16 TAs\"></group></group>"
 								+ "</group></addressBook>"));
-		ab.addGroup("CS18 TAs", "CS TAs");
+		try {
+			ab.addGroup("CS18 TAs", "CS TAs");
+		} catch (ParseException e1) {
+			System.out.println(false);
+		}
 		System.out.println(ab.toXML().equals(
 				"<addressBook><group name=\"RISD\"></group><group name=\"Brown\">"
 						+ "<group name=\"CS TAs\"><group name=\"CS18 TAs\">"
@@ -383,28 +426,30 @@ public class AddressBook {
 					"CS18 TAs");
 			// this code should be reachable
 			System.out.println(true);
-		} catch (ImaginaryFriendException e) {
+		} catch (ImaginaryFriendException | ParseException | ThisIsntMutualException e) {
 			System.out.println(false);
 		}
-		System.out
-				.println(ab
-						.toXML()
-						.equals("<addressBook><group name=\"RISD\"></group><group name=\"Brown\">"
-								+ "<group name=\"CS TAs\"><group name=\"CS18 TAs\">"
-								+ "<contact><name>random TA</name>"
-								+ "<number>401</number><ownid>3</ownid>"
-								+ "<friends></friends></contact></group>"
-								+ "<group name=\"CS16 TAs\"></group></group>"
-								+ "</group></addressBook>"));
+		System.out.println(ab.toXML().equals(
+				"<addressBook><group name=\"RISD\"></group><group name=\"Brown\">"
+						+ "<group name=\"CS TAs\"><group name=\"CS18 TAs\">"
+						+ "<contact><name>random TA</name>"
+						+ "<number>401</number><ownid>3</ownid>"
+						+ "<friends></friends></contact></group>"
+						+ "<group name=\"CS16 TAs\"></group></group>"
+						+ "</group></addressBook>"));
 		System.out
 				.println("========== adding groups to groups with contacts in them ==========");
-		ab.addGroup("awesome TAs", "CS18 TAs");
+		try {
+			ab.addGroup("awesome TAs", "CS18 TAs");
+		} catch (ParseException e1) {
+			System.out.println(false);
+		}
 		try {
 			ab.addContact(ab.makeContact("Zach", "99", 64, new int[0]),
 					"awesome TAs");
 			// code should be reached
 			System.out.println(true);
-		} catch (ImaginaryFriendException e) {
+		} catch (Exception e) {
 			// code should not be reached
 			System.out.println(false);
 		}
@@ -456,6 +501,59 @@ public class AddressBook {
 				.equals("CS18 TAs"));
 		System.out.println(ab.listSubGroups("CS TAs").get(1).getName()
 				.equals("CS16 TAs"));
+		
+		System.out.println("======= cant have unmutual friendships =======");
+		try {
+			new AddressBook(XMLParser.parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid>2</ownid>"
+					+ "<friends><id>1</id></friends></contact>"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends></friends></contact></group></addressBook>"));
+			// this code should not be reachable
+			System.out.println(false);
+		} catch (Exception e) {
+			// should be reachable code
+			System.out.println(true);
+		}
+		System.out.println("======= cant have nonexistent friends =======");
+		try {
+			new AddressBook(XMLParser.parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid>2</ownid>"
+					+ "<friends><id>100</id></friends></contact>"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends></friends></contact></group></addressBook>"));
+			// this code should not be reachable
+			System.out.println(false);
+		} catch (Exception e) {
+			// should be reachable code
+			System.out.println(true);
+		}
+		System.out.println("======= cant be friendss with yourself =======");
+		try {
+			new AddressBook(XMLParser.parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid>2</ownid>"
+					+ "<friends><id>2</id></friends></contact>"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends></friends></contact></group></addressBook>"));
+			// this code should not be reachable
+			System.out.println(false);
+		} catch (Exception e) {
+			// should be reachable code
+			System.out.println(true);
+		}
+		System.out.println("======= cant have duplicate friends =======");
+		try {
+			new AddressBook(XMLParser.parseString("<addressBook><group name=\"group 1\">"
+					+ "<contact><name></name><number></number><ownid>2</ownid>"
+					+ "<friends><id>2</id><id>2</id></friends></contact>"
+					+ "<contact><name></name><number></number><ownid>1</ownid>"
+					+ "<friends></friends></contact></group></addressBook>"));
+			// this code should not be reachable
+			System.out.println(false);
+		} catch (Exception e) {
+			// should be reachable code
+			System.out.println(true);
+		}
 	}
 
 	/**
