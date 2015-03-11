@@ -107,11 +107,8 @@ public class Client {
 		case "pull":
 
 			sendToServer("PULL");
-			try {
-				receiveAddressBook();				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			receiveAddressBook();
+			System.out.println(addressBook.toXML());
 			
 			break;
 		case "push":
@@ -151,7 +148,7 @@ public class Client {
 	}
 
 	private void receiveAddressBook() throws IOException,
-			ImaginaryFriendException, ThisIsntMutualException, ParseException {
+			ImaginaryFriendException, ThisIsntMutualException {
 				
 		StringBuilder sb = new StringBuilder();
 
@@ -164,7 +161,7 @@ public class Client {
 		System.out.println("book: "+ book);
 		if(book != null){
 			try {
-				addressBook = new AddressBook(XMLParser.parseString(sb.toString()));
+				addressBook = new AddressBook(XMLParser.parseString(book));
 			} catch (ParseException e){
 				e.printStackTrace();
 			}			
