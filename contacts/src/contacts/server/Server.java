@@ -11,7 +11,7 @@ import contacts.parser.ThisIsntMutualException;
 import contacts.parser.XMLParser;
 
 public class Server {
-	
+
 	private boolean finished;
 	private int port;
 	public Socket socket;
@@ -20,87 +20,110 @@ public class Server {
 	private OutputStream outputStream;
 	BufferedReader clientInput;
 	BufferedWriter clientWriter;
-	
+
 	private Graph graph;
-	
-	public Server(int _port, String xml) throws IOException, ParseException, ImaginaryFriendException, ThisIsntMutualException {
+
+	public Server(String xml, int _port) throws IOException, ParseException,
+			ImaginaryFriendException, ThisIsntMutualException {
 		this.graph = new Graph(xml);
 		port = _port;
 		serv = new ServerSocket(port);
 		finished = false;
 	}
-	
-	
-	public void getClientInput() {
-		
-		while(!finished){
-			try {
-				socket = serv.accept(); //connect with socket
-				BufferedReader clientInput = new BufferedReader(new InputStreamReader(
-						socket.getInputStream()));
 
-				String content = clientInput.readLine();
-				while (content != null) {
-					reactToClient(content, socket);
-				}
-				clientWriter.flush();
-				socket.shutdownOutput();
-			} catch (IOException e) {
-				//System.out.println("Server couldn't connect!");
-			}
-			
+	public void listen() throws ImaginaryFriendException,
+			ThisIsntMutualException, ParseException, IOException {
+
+		while (true) {		
+			socket = serv.accept(); 
+
+			String input = receiveInput();
+			sendToClient(input, socket);
+
 		}
 	}
 	
-	private void sendToClient(String content, Socket socket) throws IOException {
-		clientWriter = new BufferedWriter(new OutputStreamWriter(
-				socket.getOutputStream()));
-		
-		if(content != null) {
-			clientWriter.write(content + " recieved");
-			clientWriter.flush();
-			socket.shutdownOutput();
+	private void sendToClient(String message, Socket sock) throws IOException {
+		outputStream = sock.getOutputStream();
+		outputStream.write(message.getBytes());
+		System.out.println("server sent:" + message);
+		outputStream.flush();
+		//System.out.println("message: " + sb.toString());
+		socket.shutdownOutput();
+	}
+	
+	private String receiveInput() throws IOException {
+		BufferedReader clientInput = new BufferedReader(
+				new InputStreamReader(socket.getInputStream()));
+		OutputStream outputStream = socket.getOutputStream();
+		clientWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+		StringBuilder sb = new StringBuilder();
+
+		int content = clientInput.read();
+		while (content != -1 && content != 10) { //10 = \n char
+			sb.append((char)content);								
+			content = clientInput.read();
 		}
+		socket.shutdownInput();
+		
+		String message = sb.toString();
+		
+		switch(message) {
+			case "PULL" :
+				message = graph.toXML();
+				break;
+		}
+		
+		return message;
 	}
 
-	private void reactToClient(String content, Socket socket) throws IOException {
-		
+
+	private void reactToClient(String content, Socket socket)
+			throws IOException, ImaginaryFriendException,
+			ThisIsntMutualException, ParseException {
+
 		content = content.toLowerCase();
-		switch(content) {
-			case "pull" :
-				sendToClient(graph.toXML(), socket);
-				break;
-			case "push" :
-				//do something
-				sendToClient(content, socket);
-				break;
-			case "query mutual":
-				sendToClient(content, socket);
-				//do something
-				break;
-			case "query path" :
-				sendToClient(content, socket);
-				//do something
-				break;
+		switch (content) {
+		case "PULL":
+			sendToClient(graph.toXML(), socket);
+			break;
+		case "PUSH":
+			sendToClient(content, socket);
+			/*
+			 * String xml = clientInput.readLine(); if (content != null) { graph
+			 * = new Graph(xml); } clientWriter.write("xml received!");
+			 * graph.getAddressBook().printAdressBook(); clientWriter.flush();
+			 */
+			break;
+		case "QUERY MUTUAL":
+			sendToClient(content, socket);
+			// do something
+			break;
+		case "QUERY PATH":
+			sendToClient(content, socket);
+			// do something
+			break;
 		}
-		
 	}
-	
-	
+
 	/**
 	 * @param args
-	 * @throws ThisIsntMutualException 
-	 * @throws ImaginaryFriendException 
-	 * @throws ParseException 
+	 * @throws ThisIsntMutualException
+	 * @throws ImaginaryFriendException
+	 * @throws ParseException
 	 */
-	public static void main(String[] args) throws ParseException, ImaginaryFriendException, ThisIsntMutualException {
+	public static void main(String[] args) throws ParseException,
+			ImaginaryFriendException, ThisIsntMutualException {
 		try {
-			Server s = new Server(1818, "this should be a string of xml?");
-			s.getClientInput();
+			Integer p = Integer.parseInt(args[1]);
+			String fileName = args[0];
+			String xml = XMLParser.parse(fileName).toXML();
+			Server s = new Server(xml, p);
+			s.listen();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 
 	}
 
