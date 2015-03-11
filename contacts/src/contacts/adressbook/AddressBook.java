@@ -76,13 +76,13 @@ public class AddressBook {
 	 */
 	public void addContact(Contact c, String g)
 			throws ImaginaryFriendException, ThisIsntMutualException {
-		c.checkIfMutual();
 		this.nameToGroup.get(g).addContact(c);
 		this.allContacts.add(c.getID());
 		nameToContact.put(c.getName(), c);
 		idToContact.put(c.getID(), c);
 		c.addFriendsToContact(this.idToContact);
 		c.addMutualFriends();
+		c.checkIfMutual();
 	}
 
 	/**
