@@ -271,7 +271,7 @@ public class XMLParser {
 	/**
 	 * test cases
 	 */
-	private static void testXMLParser() {
+	public static void testXMLParser() {
 		System.out.println("======= parsing the example =======");
 		// parsing the given example works
 		try {
