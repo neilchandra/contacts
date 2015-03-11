@@ -4,11 +4,7 @@ import java.io.*;
 import java.net.*;
 
 import contacts.adressbook.*;
-import contacts.parser.ImaginaryFriendException;
-import contacts.parser.ParseException;
-import contacts.parser.ParsedAddressBook;
-import contacts.parser.ThisIsntMutualException;
-import contacts.parser.XMLParser;
+import contacts.parser.*;
 
 public class Client {
 
@@ -35,86 +31,114 @@ public class Client {
 
 	private int port;
 
-	public Client(int _port) throws IOException, ParseException,
-			ImaginaryFriendException, ThisIsntMutualException {
-		ParsedAddressBook pab = XMLParser.parse("src/contacts/example.xml");
-		addressBook = new AddressBook(pab);
-
+	public Client(String filePath, int _port) throws IOException,
+			ParseException, ImaginaryFriendException, ThisIsntMutualException {
+		addressBook = new AddressBook(XMLParser.parse(filePath));
 		port = _port;
-		socket = new Socket("localhost", port);
-		finished = false;
-		inputStream = socket.getInputStream();
-		outputStream = socket.getOutputStream();
 		userReader = new BufferedReader(new InputStreamReader(System.in));
-		servReader = new BufferedReader(new InputStreamReader(inputStream));
 		userWriter = new BufferedWriter(new OutputStreamWriter(System.out));
-		servWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+		finished = false;
+		System.out.println(addressBook.toXML());
 	}
 
+	public String getCommand(String prompt) throws IOException {
+		userReader = new BufferedReader(new InputStreamReader(System.in));
 
-	private void getUserInput() throws IOException {
-		while (!finished) {
+		System.out.print(prompt);
+		String command = userReader.readLine();
 
-			// Read command in and break in words
-			String command = userReader.readLine();
-			command = command.toLowerCase();
+		return command;
+	}
 
-			switch (command) {
-			case "add":
-				break;
-			case "remove":
-				// prompts for name of contact to be deleted
-				System.out.print("name:");
-				command = userReader.readLine();
+	public void dialog() throws IOException, ImaginaryFriendException,
+			ThisIsntMutualException, ParseException {
+		while (true) {
+			getUserInput();
+		}
+	}
 
-				// contact should be deleted and references from friends deleted
+	private void sendToServer(String message) throws IOException {
 
-				break;
-			case "group":
-				// prompts user for group name
-				System.out.print("group name:");
+		socket = new Socket("localhost", port);
+		inputStream = socket.getInputStream();
+		outputStream = socket.getOutputStream();
 
-				// prints out all members of that group
-				break;
-			case "pull":
-				// retrieves the latest version of the addressbook from the
-				// server
-				// converts that XML version into an addressbook
-				// sets addressbook equal to that newly parsed one
+		System.out.println("client sent: " + message);
+		outputStream.write(message.getBytes());
+		outputStream.flush();
+		socket.shutdownOutput();
+	}
 
-				sendToServer("PULL");
+	private void getServerOutput() throws IOException {
+		StringBuilder sb = new StringBuilder();
 
-				getServerOutput();
-				receiveAddressBook();
+		int content = inputStream.read();
+		while (content != -1 && content != 10) {
+			sb.append((char) content);
+			content = inputStream.read();
+		}
+		System.out.println("client received: " + sb.toString());
+		socket.shutdownInput();
+	}
 
-				break;
-			case "push":
-				// writes Client version of addressbook to XML
-				// sends that XML version to the server
-				sendToServer("PUSH");
-				sendAddressBook();
-				getServerOutput();
-				break;
-			case "query path":
-				// do stuff
-				sendToServer("QUERY PATH");
-				getServerOutput();
-				break;
-			case "query mutual":
-				// do stuff
-				sendToServer("QUERY MUTUAL");
-				getServerOutput();
-				break;
-			case "quit":
-				// saves addressbook and exits the program
-				finished = true;
-				break;
-			default:
-				System.out
-						.println("Please input one of the following: remove, "
-								+ "group, pull, push, query path, query mutual, quit");
-				break;
-			}
+	private void getUserInput() throws IOException, ImaginaryFriendException,
+			ThisIsntMutualException {
+
+		// Read command in and break in words
+		String command = getCommand("Input a command:");
+
+		command = command.toLowerCase();
+
+		switch (command) {
+		case "add":
+			break;
+		case "remove":
+			// prompts for name of contact to be deleted
+			String name = getCommand("name: ");
+			addressBook.removeContact(name);
+
+			break;
+		case "group":
+			// prompts user for group name
+			System.out.print("group name:");
+
+			// prints out all members of that group
+			break;
+		case "pull":
+
+			sendToServer("PULL");
+			receiveAddressBook();
+			System.out.println(addressBook.toXML());
+			
+			break;
+		case "push":
+			// writes Client version of addressbook to XML
+			// sends that XML version to the server
+			sendToServer("PUSH");
+			getServerOutput();
+
+			break;
+		case "query path":
+			// do stuff
+			sendToServer("QUERY PATH");
+			getServerOutput();
+			// getServerOutput();
+			break;
+		case "query mutual":
+			// do stuff
+			sendToServer("QUERY MUTUAL");
+			getServerOutput();
+			// getServerOutput();
+			break;
+		case "quit":
+			// saves addressbook and exits the program
+			finished = true;
+			break;
+		default:
+			System.out.println("Please input one of the following: remove, "
+					+ "group, pull, push, query path, query mutual, quit");
+			getUserInput();
+			break;
 		}
 
 	}
@@ -123,29 +147,39 @@ public class Client {
 		sendToServer(addressBook.toXML());
 	}
 
-	private void receiveAddressBook() {
+	private void receiveAddressBook() throws IOException,
+			ImaginaryFriendException, ThisIsntMutualException {
+				
+		StringBuilder sb = new StringBuilder();
 
+		int content = inputStream.read();
+		while (content != -1 && content != 10) {
+			sb.append((char) content);
+			content = inputStream.read();
+		}
+		String book = sb.toString();
+		System.out.println("book: "+ book);
+		if(book != null){
+			try {
+				addressBook = new AddressBook(XMLParser.parseString(book));
+			} catch (ParseException e){
+				e.printStackTrace();
+			}			
+		}
 	}
 
-	private void sendToServer(String output) throws IOException {
-		if (output != null) {
-			servWriter.write(output);
-		}
-		servWriter.flush();
-		socket.shutdownOutput();
-	}
+	private boolean getConfirmation() throws IOException {
+		StringBuilder sb = new StringBuilder();
 
-	private void getServerOutput() throws IOException {
-
-		String content = servReader.readLine();
-		while (content != null) {
-			userWriter.write(content + "\n");
-			content = servReader.readLine();
+		int content = inputStream.read();
+		while (content != -1 && content != 10) {
+			sb.append((char) content);
+			content = inputStream.read();
 		}
-		userWriter.flush();
 		socket.shutdownInput();
-		finished = false;
-		getUserInput();
+		socket.close();
+		return (sb.toString().equals("xml received!"));
+
 	}
 
 	/**
@@ -153,13 +187,15 @@ public class Client {
 	 * @throws ThisIsntMutualException
 	 * @throws ImaginaryFriendException
 	 * @throws ParseException
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws ParseException,
 			ImaginaryFriendException, ThisIsntMutualException, IOException {
+		String filePath = args[0];
+		Integer _port = Integer.parseInt(args[1]);
 
-		Client c;
-		c = new Client(1818);
-		c.getUserInput();
+		Client c = new Client(filePath, _port);
+		c.dialog();
+
 	}
 }

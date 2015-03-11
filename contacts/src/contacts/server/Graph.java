@@ -51,6 +51,15 @@ public class Graph implements IGraph {
 	public String toXML() {
 		return ab.toXML();
 	}
+	
+	/**
+	 * Returns the currrent address book
+	 * @return -- ab
+	 */
+	public AddressBook getAddressBook(){
+		return this.ab;
+	}
+	
 	/**
 	 * finds the shortest path between two nodes
 	 * @param contactName1 the name of the contact of the start node
