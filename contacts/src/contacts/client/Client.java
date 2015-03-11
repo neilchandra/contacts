@@ -52,7 +52,7 @@ public class Client {
 
 	public void dialog() throws IOException, ImaginaryFriendException,
 			ThisIsntMutualException, ParseException {
-		while (true) {
+		while (!finished) {
 			getUserInput();
 		}
 	}
@@ -78,7 +78,12 @@ public class Client {
 			content = inputStream.read();
 		}
 		System.out.println("client received: " + sb.toString());
-		socket.shutdownInput();
+
+		if(sb.toString().equals("PUSH CALLED")){
+			sendAddressBook();
+			getServerOutput();
+		} 
+		
 	}
 
 	private void getUserInput() throws IOException, ImaginaryFriendException,
@@ -108,7 +113,7 @@ public class Client {
 
 			sendToServer("PULL");
 			receiveAddressBook();
-			System.out.println(addressBook.toXML());
+			System.out.println("new: "+addressBook.toXML());
 			
 			break;
 		case "push":
@@ -116,7 +121,10 @@ public class Client {
 			// sends that XML version to the server
 			sendToServer("PUSH");
 			getServerOutput();
-
+			//sendToServer(addressBook.toXML());
+			
+			
+			System.out.println(getConfirmation());
 			break;
 		case "query path":
 			// do stuff
@@ -149,7 +157,6 @@ public class Client {
 
 	private void receiveAddressBook() throws IOException,
 			ImaginaryFriendException, ThisIsntMutualException {
-				
 		StringBuilder sb = new StringBuilder();
 
 		int content = inputStream.read();
@@ -158,7 +165,7 @@ public class Client {
 			content = inputStream.read();
 		}
 		String book = sb.toString();
-		System.out.println("book: "+ book);
+		
 		if(book != null){
 			try {
 				addressBook = new AddressBook(XMLParser.parseString(book));
@@ -168,7 +175,7 @@ public class Client {
 		}
 	}
 
-	private boolean getConfirmation() throws IOException {
+	private String getConfirmation() throws IOException {
 		StringBuilder sb = new StringBuilder();
 
 		int content = inputStream.read();
@@ -176,9 +183,7 @@ public class Client {
 			sb.append((char) content);
 			content = inputStream.read();
 		}
-		socket.shutdownInput();
-		socket.close();
-		return (sb.toString().equals("xml received!"));
+		return sb.toString();
 
 	}
 

@@ -32,78 +32,68 @@ public class Server {
 	}
 
 	public void listen() throws ImaginaryFriendException,
-			ThisIsntMutualException, ParseException, IOException {
+			ThisIsntMutualException, IOException {
 
-		while (true) {		
-			socket = serv.accept(); 
-
+		while (true) {
+			socket = serv.accept();
 			String input = receiveInput();
 			sendToClient(input, socket);
+			
+			if(input.equals("PUSH CALLED")){
+				socket = serv.accept();
+				String xml = receiveInput();
+				String reply;
+				try {
+					System.out.println("old ab: "+graph.toXML());
+					graph = new Graph(xml);
+					System.out.println("new ab: "+graph.toXML());
+
+					reply = "OK";
+				} catch (ParseException e){
+					reply = "ERROR";
+				}
+				sendToClient(reply, socket);
+			}
 
 		}
 	}
-	
+
 	private void sendToClient(String message, Socket sock) throws IOException {
 		outputStream = sock.getOutputStream();
 		outputStream.write(message.getBytes());
 		System.out.println("server sent:" + message);
 		outputStream.flush();
-		//System.out.println("message: " + sb.toString());
+		// System.out.println("message: " + sb.toString());
 		socket.shutdownOutput();
 	}
-	
+
 	private String receiveInput() throws IOException {
-		BufferedReader clientInput = new BufferedReader(
-				new InputStreamReader(socket.getInputStream()));
+		BufferedReader clientInput = new BufferedReader(new InputStreamReader(
+				socket.getInputStream()));
 		OutputStream outputStream = socket.getOutputStream();
 		clientWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
 		StringBuilder sb = new StringBuilder();
 
 		int content = clientInput.read();
-		while (content != -1 && content != 10) { //10 = \n char
-			sb.append((char)content);								
+		while (content != -1 && content != 10) { // 10 = \n char
+			sb.append((char) content);
 			content = clientInput.read();
 		}
-		socket.shutdownInput();
-		
+
 		String message = sb.toString();
-		
-		switch(message) {
-			case "PULL" :
-				message = graph.toXML();
-				break;
-		}
-		
-		return message;
-	}
+		System.out.println("server received: "+message);
+		socket.shutdownInput();
 
-
-	private void reactToClient(String content, Socket socket)
-			throws IOException, ImaginaryFriendException,
-			ThisIsntMutualException, ParseException {
-
-		content = content.toLowerCase();
-		switch (content) {
+		switch (message) {
 		case "PULL":
-			sendToClient(graph.toXML(), socket);
+			message = graph.toXML();
 			break;
 		case "PUSH":
-			sendToClient(content, socket);
-			/*
-			 * String xml = clientInput.readLine(); if (content != null) { graph
-			 * = new Graph(xml); } clientWriter.write("xml received!");
-			 * graph.getAddressBook().printAdressBook(); clientWriter.flush();
-			 */
-			break;
-		case "QUERY MUTUAL":
-			sendToClient(content, socket);
-			// do something
-			break;
-		case "QUERY PATH":
-			sendToClient(content, socket);
-			// do something
+			message = "PUSH CALLED";
 			break;
 		}
+
+		return message;
 	}
 
 	/**
@@ -122,6 +112,8 @@ public class Server {
 			s.listen();
 
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
 
