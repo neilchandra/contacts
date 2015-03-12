@@ -2,6 +2,7 @@ package contacts.server;
 
 import java.io.*;
 import java.net.*;
+import java.util.NoSuchElementException;
 
 import contacts.adressbook.*;
 import contacts.parser.ImaginaryFriendException;
@@ -20,6 +21,8 @@ public class Server {
 	private OutputStream outputStream;
 	BufferedReader clientInput;
 	BufferedWriter clientWriter;
+	private boolean receivedFirst, receivedSecond, queryingPath;
+	private String queryFirst, querySecond;
 
 	private Graph graph;
 
@@ -29,6 +32,9 @@ public class Server {
 		port = _port;
 		serv = new ServerSocket(port);
 		finished = false;
+		queryingPath = false;
+		receivedFirst = false;
+		receivedSecond = false;
 	}
 
 	public void listen() throws ImaginaryFriendException,
@@ -53,7 +59,24 @@ public class Server {
 					reply = "ERROR";
 				}
 				sendToClient(reply, socket);
+			}/*
+			else if(!receivedFirst && queryingPath){
+				socket = serv.accept();
+				queryFirst = receiveInput();
+				receivedFirst = true;
+				String reply = "SEND SECOND QUERY";
+				sendToClient(reply, socket);
+			} else if(!receivedSecond && receivedFirst && queryingPath){
+				socket = serv.accept();
+				querySecond = receiveInput();
+				System.out.println("query1: "+queryFirst+" query2: "+querySecond);
+				receivedSecond = true;
+				queryingPath = false;
+				String reply = graph.shortestPath(queryFirst, querySecond);
+				sendToClient(reply, socket);
 			}
+			*/
+			
 
 		}
 	}
@@ -83,13 +106,28 @@ public class Server {
 		String message = sb.toString();
 		System.out.println("server received: "+message);
 		socket.shutdownInput();
-
+		
 		switch (message) {
 		case "PULL":
 			message = graph.toXML();
 			break;
 		case "PUSH":
 			message = "PUSH CALLED";
+			break;
+		case "QUERY PATH" :
+			
+			try {
+				message = graph.shortestPath("Mitchell", "Ally");
+				graph = new Graph(graph.toXML());
+			} catch (Exception e) {
+				message = "Invalid inputs";
+			}
+			
+			
+			receivedFirst = false;
+			receivedSecond = false;
+			queryingPath = true;
+			//message = "QUERY PATH CALLED";
 			break;
 		}
 

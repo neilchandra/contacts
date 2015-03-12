@@ -28,6 +28,8 @@ public class Client {
 
 	/** The local copy of the address book */
 	private AddressBook addressBook;
+	
+	private String queryFirst, querySecond;
 
 	private int port;
 
@@ -73,7 +75,7 @@ public class Client {
 		StringBuilder sb = new StringBuilder();
 
 		int content = inputStream.read();
-		while (content != -1 && content != 10) {
+		while (content != -1) {
 			sb.append((char) content);
 			content = inputStream.read();
 		}
@@ -82,11 +84,17 @@ public class Client {
 		if(sb.toString().equals("PUSH CALLED")){
 			sendAddressBook();
 			getServerOutput();
-		} 
+		} else if (sb.toString().equals("QUERY PATH CALLED")){			
+			sendToServer(queryFirst);
+			getServerOutput();
+		} else if(sb.toString().equals("SEND SECOND QUERY")){
+			sendToServer(querySecond);
+			getServerOutput();
+		}
 		
 	}
 
-	private void getUserInput() throws IOException, ImaginaryFriendException,
+	private void getUserInput() throws IOException,
 			ThisIsntMutualException {
 
 		// Read command in and break in words
@@ -96,23 +104,34 @@ public class Client {
 
 		switch (command) {
 		case "add":
+			String person = getCommand("name: ");
+			String number = getCommand("number: ");
+			String friendsString = getCommand("friends: ");
 			break;
 		case "remove":
 			// prompts for name of contact to be deleted
 			String name = getCommand("name: ");
-			addressBook.removeContact(name);
+			try{
+				addressBook.removeContact(name);				
+			} catch(ImaginaryFriendException e) {
+				System.out.println(name + " couldn't be removed!");
+			}
 
 			break;
 		case "group":
 			// prompts user for group name
-			System.out.print("group name:");
+			String groupName = getCommand("group name: ");
 
 			// prints out all members of that group
 			break;
 		case "pull":
 
 			sendToServer("PULL");
-			receiveAddressBook();
+			try{
+				receiveAddressBook();
+			} catch (ImaginaryFriendException e) {
+				System.out.println("address book was not received: ImaginaryFriendException");
+			}
 			System.out.println("new: "+addressBook.toXML());
 			
 			break;
@@ -127,6 +146,8 @@ public class Client {
 			System.out.println(getConfirmation());
 			break;
 		case "query path":
+			queryFirst = getCommand("Person 1: ");
+			querySecond = getCommand("Person 2: ");
 			// do stuff
 			sendToServer("QUERY PATH");
 			getServerOutput();
