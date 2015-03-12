@@ -28,7 +28,7 @@ public class Client {
 
 	/** The local copy of the address book */
 	private AddressBook addressBook;
-	
+
 	private String queryFirst, querySecond;
 
 	private int port;
@@ -81,17 +81,17 @@ public class Client {
 		}
 		System.out.println("client received: " + sb.toString());
 
-		if(sb.toString().equals("PUSH CALLED")){
+		if (sb.toString().equals("PUSH CALLED")) {
 			sendAddressBook();
 			getServerOutput();
-		} else if (sb.toString().equals("QUERY PATH CALLED")){			
+		} else if (sb.toString().equals("QUERY PATH CALLED")
+				|| sb.toString().equals("QUERY MUTUAL CALLED")) {
 			sendToServer(queryFirst + "\n" + querySecond);
 			getServerOutput();
-		} 
+		}
 	}
 
-	private void getUserInput() throws IOException,
-			ThisIsntMutualException {
+	private void getUserInput() throws IOException, ThisIsntMutualException {
 
 		// Read command in and break in words
 		String command = getCommand("Input a command:");
@@ -107,9 +107,9 @@ public class Client {
 		case "remove":
 			// prompts for name of contact to be deleted
 			String name = getCommand("name: ");
-			try{
-				addressBook.removeContact(name);				
-			} catch(ImaginaryFriendException e) {
+			try {
+				addressBook.removeContact(name);
+			} catch (ImaginaryFriendException e) {
 				System.out.println(name + " couldn't be removed!");
 			}
 
@@ -123,37 +123,35 @@ public class Client {
 		case "pull":
 
 			sendToServer("PULL");
-			try{
+			try {
 				receiveAddressBook();
 			} catch (ImaginaryFriendException e) {
-				System.out.println("address book was not received: ImaginaryFriendException");
+				System.out
+						.println("address book was not received: ImaginaryFriendException");
 			}
-			System.out.println("new: "+addressBook.toXML());
-			
+			System.out.println("new: " + addressBook.toXML());
+
 			break;
 		case "push":
 			// writes Client version of addressbook to XML
 			// sends that XML version to the server
 			sendToServer("PUSH");
 			getServerOutput();
-			//sendToServer(addressBook.toXML());
-			
-			
+			// sendToServer(addressBook.toXML());
+
 			System.out.println(getConfirmation());
 			break;
 		case "query path":
 			queryFirst = getCommand("Person 1: ");
 			querySecond = getCommand("Person 2: ");
-			// do stuff
 			sendToServer("QUERY PATH");
 			getServerOutput();
-			// getServerOutput();
 			break;
 		case "query mutual":
-			// do stuff
+			queryFirst = getCommand("Person 1: ");
+			querySecond = getCommand("Person 2: ");
 			sendToServer("QUERY MUTUAL");
 			getServerOutput();
-			// getServerOutput();
 			break;
 		case "quit":
 			// saves addressbook and exits the program
@@ -182,13 +180,13 @@ public class Client {
 			content = inputStream.read();
 		}
 		String book = sb.toString();
-		
-		if(book != null){
+
+		if (book != null) {
 			try {
 				addressBook = new AddressBook(XMLParser.parseString(book));
-			} catch (ParseException e){
+			} catch (ParseException e) {
 				e.printStackTrace();
-			}			
+			}
 		}
 	}
 

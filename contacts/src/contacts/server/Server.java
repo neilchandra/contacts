@@ -73,25 +73,21 @@ public class Server {
 				} else {
 					sendToClient("Invalid inputs", socket);
 				}
-			}
-			
-			/*
-			else if(!receivedFirst && queryingPath){
+			} else if(input.equals("QUERY MUTUAL CALLED")){
 				socket = serv.accept();
-				queryFirst = receiveInput();
-				receivedFirst = true;
-				String reply = "SEND SECOND QUERY";
-				sendToClient(reply, socket);
-			} else if(!receivedSecond && receivedFirst && queryingPath){
-				socket = serv.accept();
-				querySecond = receiveInput();
-				System.out.println("query1: "+queryFirst+" query2: "+querySecond);
-				receivedSecond = true;
-				queryingPath = false;
-				String reply = graph.shortestPath(queryFirst, querySecond);
-				sendToClient(reply, socket);
+				String [] people = receiveInput().split("\n");
+				if(people.length == 2) {
+					try {
+						sendToClient(graph.mutualNodes(people[0], people[1]), socket);
+						graph = new Graph(graph.toXML());
+					} catch (Exception e) {
+						sendToClient("Invalid inputs", socket);
+					}
+					
+				} else {
+					sendToClient("Invalid inputs", socket);
+				}
 			}
-			*/
 			
 
 		}
@@ -131,6 +127,9 @@ public class Server {
 			break;
 		case "QUERY PATH" :
 			message = "QUERY PATH CALLED";
+			break;
+		case "QUERY MUTUAL" :
+			message = "QUERY MUTUAL CALLED";
 			break;
 		}
 		socket.shutdownInput();
