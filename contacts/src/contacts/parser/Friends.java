@@ -96,8 +96,7 @@ public class Friends implements ParseNode {
 	 * @return an int representing id
 	 */
 	public int getID() {
-		return this.friendsID;
-		
+		return this.friendsID;	
 	}
 
 }

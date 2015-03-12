@@ -46,7 +46,14 @@ public class Graph implements IGraph {
 
 	@Override
 	public Collection<IGraphNode> getNodes() {
-		return nodes;
+		try {
+			return (new Graph(this.toXML())).nodes;
+		} catch (ImaginaryFriendException | ThisIsntMutualException
+				| ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -159,7 +166,7 @@ public class Graph implements IGraph {
 	 * @throws ThisIsntMutualException
 	 * @throws ParseException
 	 */
-	public static void main(String[] args) {
+	public static void graphTests() {
 		System.out.println("=========== creating the graph ===========");
 		// initializing the addressBook
 		AddressBook ab = null;
@@ -220,6 +227,12 @@ public class Graph implements IGraph {
 		System.out
 				.println(g.mutualNodes("Luke", "Jake").equals("Sam\nMitch\n"));
 		System.out.println("=========== shortest path ===========");
+		try {
+			g = new Graph(g.toXML());
+		} catch (ImaginaryFriendException | ThisIsntMutualException
+				| ParseException e) {
+			e.printStackTrace();
+		}
 		// no path between contacts
 		System.out.println(g.shortestPath("Luke", "Mark").equals(
 				"no path between contacts"));
@@ -235,6 +248,20 @@ public class Graph implements IGraph {
 		} catch (NoSuchElementException e) {
 			System.out.println(true);
 		}
+		try {
+			g = new Graph(g.toXML());
+		} catch (ImaginaryFriendException | ThisIsntMutualException
+				| ParseException e) {
+			e.printStackTrace();
+		}
+		System.out.println(g.shortestPath("Neil", "Timmy").equals(
+				"Neil\nMitch\nSam\nTimmy\n"));
+		try {
+			g = new Graph(g.toXML());
+		} catch (ImaginaryFriendException | ThisIsntMutualException
+				| ParseException e) {
+			e.printStackTrace();
+		}
+		System.out.println(g.shortestPath("Timmy", "Neil").equals("Timmy\nSam\nMitch\nNeil\n"));
 	}
-
 }
