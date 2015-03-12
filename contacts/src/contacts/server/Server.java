@@ -59,7 +59,23 @@ public class Server {
 					reply = "ERROR";
 				}
 				sendToClient(reply, socket);
-			}/*
+			} else if(input.equals("QUERY PATH CALLED")){
+				socket = serv.accept();
+				String [] people = receiveInput().split("\n");
+				if(people.length == 2) {
+					try {
+						sendToClient(graph.shortestPath(people[0], people[1]), socket);
+						graph = new Graph(graph.toXML());
+					} catch (Exception e) {
+						sendToClient("Invalid inputs", socket);
+					}
+					
+				} else {
+					sendToClient("Invalid inputs", socket);
+				}
+			}
+			
+			/*
 			else if(!receivedFirst && queryingPath){
 				socket = serv.accept();
 				queryFirst = receiveInput();
@@ -98,14 +114,13 @@ public class Server {
 		StringBuilder sb = new StringBuilder();
 
 		int content = clientInput.read();
-		while (content != -1 && content != 10) { // 10 = \n char
+		while (content != -1) { // 10 = \n char
 			sb.append((char) content);
 			content = clientInput.read();
 		}
 
 		String message = sb.toString();
 		System.out.println("server received: "+message);
-		socket.shutdownInput();
 		
 		switch (message) {
 		case "PULL":
@@ -115,21 +130,10 @@ public class Server {
 			message = "PUSH CALLED";
 			break;
 		case "QUERY PATH" :
-			
-			try {
-				message = graph.shortestPath("Mitchell", "Ally");
-				graph = new Graph(graph.toXML());
-			} catch (Exception e) {
-				message = "Invalid inputs";
-			}
-			
-			
-			receivedFirst = false;
-			receivedSecond = false;
-			queryingPath = true;
-			//message = "QUERY PATH CALLED";
+			message = "QUERY PATH CALLED";
 			break;
 		}
+		socket.shutdownInput();
 
 		return message;
 	}

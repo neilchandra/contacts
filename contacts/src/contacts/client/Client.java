@@ -85,13 +85,9 @@ public class Client {
 			sendAddressBook();
 			getServerOutput();
 		} else if (sb.toString().equals("QUERY PATH CALLED")){			
-			sendToServer(queryFirst);
+			sendToServer(queryFirst + "\n" + querySecond);
 			getServerOutput();
-		} else if(sb.toString().equals("SEND SECOND QUERY")){
-			sendToServer(querySecond);
-			getServerOutput();
-		}
-		
+		} 
 	}
 
 	private void getUserInput() throws IOException,
