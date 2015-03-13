@@ -526,23 +526,4 @@ public class XMLParser {
 		}
 		
 	}
-
-	/**
-	 * main method
-	 * 
-	 * @param the
-	 *            name of the file containing the xml file
-	 * @throws FileNotFoundException
-	 * @throws ParseException
-	 */
-	public static void main(String[] args) throws FileNotFoundException,
-			ParseException {
-		testXMLParser();
-	}
-
-	//
-	// public static Contact searchIdToContact(int friendsID) {
-	// return idToContact.get(friendsID);
-	// }
-
 }

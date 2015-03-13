@@ -566,19 +566,4 @@ public class AddressBook {
 			System.out.println(true);
 		}
 	}
-
-	/**
-	 * main method for testing
-	 * 
-	 * @param args
-	 * @throws FileNotFoundException
-	 * @throws ParseException
-	 * @throws ImaginaryFriendException
-	 * @throws ThisIsntMutualException
-	 */
-	public static void main(String[] args) throws FileNotFoundException,
-			ParseException, ImaginaryFriendException, ThisIsntMutualException {
-		testAddressBook();
-
-	}
 }
