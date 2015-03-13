@@ -22,31 +22,51 @@ public class Client {
 
 	/** Buffered readers for user input and server signals */
 	private BufferedReader userReader;
-	private BufferedReader servReader;
-
-	/** Writers that writer to the server and the user */
-	private BufferedWriter servWriter;
-	private BufferedWriter userWriter;
 
 	/** The local copy of the address book */
 	private AddressBook addressBook;
 
 	private String queryFirst, querySecond;
 
+	/** the port of Client/Server interaction */
 	private int port;
+	private String host;
 
-	private boolean groupSelected;
-
-	public Client(String filePath, int _port) throws IOException,
-			ParseException, ImaginaryFriendException, ThisIsntMutualException {
+	/**
+	 * Constructs a Client Object
+	 * 
+	 * @param filePath
+	 *            - the path of the xml file to start form
+	 * @param _port
+	 *            - the port on which to communicate with the server
+	 * @throws IOException
+	 *             - in case of Server/Client initialization error
+	 * @throws ParseException
+	 *             - XML unable to be read
+	 * @throws ImaginaryFriendException
+	 *             - friend doesn't exist in addressBook
+	 * @throws ThisIsntMutualException
+	 *             - friendship not symmetric
+	 */
+	public Client(String filePath, String _host, int _port) throws IOException,
+			ImaginaryFriendException, ThisIsntMutualException, ParseException {
+		host = _host;
 		addressBook = new AddressBook(XMLParser.parse(filePath));
 		port = _port;
 		userReader = new BufferedReader(new InputStreamReader(System.in));
-		userWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 		finished = false;
 		System.out.println(addressBook.toXML());
 	}
 
+	/**
+	 * Prompts the user for a command to act upon
+	 * 
+	 * @param prompt
+	 *            - the string requesting the client for input
+	 * @return - the client's response to the prompt
+	 * @throws IOException
+	 *             - if readLine fails
+	 */
 	public String getCommand(String prompt) throws IOException {
 		userReader = new BufferedReader(new InputStreamReader(System.in));
 
@@ -56,25 +76,48 @@ public class Client {
 		return command;
 	}
 
-	public void dialog() throws IOException, ImaginaryFriendException,
-			ThisIsntMutualException, ParseException {
+	/**
+	 * Runs while the client is not finished
+	 * 
+	 * @throws IOException
+	 * @throws ImaginaryFriendException
+	 * @throws ThisIsntMutualException
+	 * @throws ParseException
+	 */
+	public void dialog() throws IOException {
 		while (!finished) {
-			getUserInput();
+			try {
+				getUserInput();
+			} catch (ThisIsntMutualException e) {
+				System.out.println("This isn't mutual error");
+			}
 		}
 	}
 
+	/**
+	 * Sends a message to the server
+	 * 
+	 * @param message
+	 *            - the String to be sent to the server
+	 * @throws IOException
+	 *             - if connection fails for some reason
+	 */
 	private void sendToServer(String message) throws IOException {
 
-		socket = new Socket("localhost", port);
+		socket = new Socket(host, port);
 		inputStream = socket.getInputStream();
 		outputStream = socket.getOutputStream();
-
-		System.out.println("client sent: " + message);
 		outputStream.write(message.getBytes());
 		outputStream.flush();
 		socket.shutdownOutput();
 	}
 
+	/**
+	 * Receives the output from the server
+	 * 
+	 * @throws IOException
+	 *             - if connection is interrupted
+	 */
 	private void getServerOutput() throws IOException {
 		StringBuilder sb = new StringBuilder();
 
@@ -83,7 +126,6 @@ public class Client {
 			sb.append((char) content);
 			content = inputStream.read();
 		}
-		System.out.println("client received: " + sb.toString());
 
 		if (sb.toString().equals("PUSH CALLED")) {
 			sendAddressBook();
@@ -92,34 +134,53 @@ public class Client {
 				|| sb.toString().equals("QUERY MUTUAL CALLED")) {
 			sendToServer(queryFirst + "\n" + querySecond);
 			getServerOutput();
+		} else {
+			System.out.println(sb.toString());
 		}
 	}
 
+	/**
+	 * Helps find the index of the group in which to add a new contact
+	 * 
+	 * @param end
+	 *            - the last possible index the client could select
+	 * @return - the index the client chose
+	 * @throws IOException
+	 *             - if getCommand fails
+	 */
 	private int getGroupIndex(int end) throws IOException {
 		System.out.println("Please input a number between 1 and " + (end + 1));
 		String selectedGroup = getCommand("index: ");
 
 		try {
 			int groupIndex = Integer.parseInt(selectedGroup);
-			
+
 			while (groupIndex < 1 || groupIndex > (end + 1)) {
-				System.out.println("received groupindex of :" + groupIndex);
 				System.out.println("Please input a number between 1 and "
 						+ (end + 1));
 				selectedGroup = getCommand("index: ");
 				groupIndex = Integer.parseInt(selectedGroup);
 			}
-			return groupIndex  - 1;
+			return groupIndex - 1;
 		} catch (NumberFormatException e) {
 			getGroupIndex(end);
 		}
-		groupSelected = true;
 
 		return -1;
 	}
 
+	/**
+	 * Gets the group in which the client wants to add a new contact
+	 * 
+	 * @param depth
+	 *            - the current distance from the top of addressbook
+	 * @param current
+	 *            - the name of the current group
+	 * @return - the Group in which the client wants to add a contact
+	 * @throws IOException
+	 *             - if getGroupIndex fails
+	 */
 	private Group getGroup(int depth, String current) throws IOException {
-		System.out.println(addressBook.nameToGroup(current));
 
 		ArrayList<Group> group;
 		if (depth == 0) {
@@ -131,10 +192,11 @@ public class Client {
 		}
 		int groupSize;
 		int counter = 0;
-		if(group != null){
+		if (group != null) {
 			groupSize = group.size();
 			for (Group g : group) {
-				System.out.print("(" + (counter + 1) + ") " + g.getName() + "  ");
+				System.out.print("(" + (counter + 1) + ") " + g.getName()
+						+ "  ");
 				counter++;
 			}
 		} else {
@@ -142,8 +204,7 @@ public class Client {
 		}
 
 		System.out.print("(" + (counter + 1) + ") new group  ");
-		
-		
+
 		if (depth > 0) {
 			counter++;
 			System.out.print("(" + (counter + 1) + ") current group");
@@ -172,7 +233,7 @@ public class Client {
 			}
 		} else if (depth > 0 && groupIndex == groupSize + 1) { // current group
 			Group toReturn = addressBook.nameToGroup(current);
-			if(toReturn == null)
+			if (toReturn == null)
 				System.out.println("Group couldn't be passed!");
 			else
 				return toReturn;
@@ -180,10 +241,17 @@ public class Client {
 			return getGroup(depth + 1, group.get(groupIndex).getName());
 		}
 
-		//return null if things go wrong
+		// return null if things go wrong
 		return null;
 	}
 
+	/**
+	 * Gets ID's for
+	 * 
+	 * @return - an array of ints representing legal Contacts
+	 * @throws IOException
+	 *             - if getCommand fails
+	 */
 	private int[] getFriends() throws IOException {
 		String friendString = getCommand("friends (separate by \", \"): ");
 		if (friendString.equals("")) {
@@ -202,6 +270,14 @@ public class Client {
 		return friendsID;
 	}
 
+	/**
+	 * Asks the client to input a legal command and acts upon that legal command
+	 * 
+	 * @throws IOException
+	 *             - if getCommand fails
+	 * @throws ThisIsntMutualException
+	 *             - in case friendship isn't symmetric
+	 */
 	private void getUserInput() throws IOException, ThisIsntMutualException {
 
 		// Read command in and break in words
@@ -215,16 +291,18 @@ public class Client {
 			String number = getCommand("number: ");
 			int[] friends = getFriends();
 			Group g = getGroup(0, null);
-			if(g == null){
+			if (g == null) {
 				System.out.println("Couldn't add contact!");
 			} else {
 				try {
-					Contact c = addressBook.makeContact(person, number, person.hashCode(), friends);
+					Contact c = addressBook.makeContact(person, number,
+							person.hashCode(), friends);
 					addressBook.addContact(c, g.getName());
 				} catch (ParseException e) {
 					System.out.println("Couldn't create Contact, parse error!");
 				} catch (ImaginaryFriendException e) {
-					System.out.println("Couldn't create Contact, friend error!");
+					System.out
+							.println("Couldn't create Contact, friend error!");
 				}
 			}
 
@@ -260,7 +338,6 @@ public class Client {
 		case "push":
 			sendToServer("PUSH");
 			getServerOutput();
-			System.out.println(getConfirmation());
 			break;
 		case "query path":
 			queryFirst = getCommand("Person 1: ");
@@ -275,7 +352,6 @@ public class Client {
 			getServerOutput();
 			break;
 		case "quit":
-			// saves addressbook and exits the program
 			finished = true;
 			break;
 		default:
@@ -287,10 +363,24 @@ public class Client {
 
 	}
 
+	/**
+	 * Sends the local copy of the addressBook to the server
+	 * 
+	 * @throws IOException
+	 *             - in case sendToServer fails
+	 */
 	private void sendAddressBook() throws IOException {
 		sendToServer(addressBook.toXML());
 	}
 
+	/**
+	 * Receives the addressBook from the server and sets the local copy equal to
+	 * it
+	 * 
+	 * @throws IOException
+	 * @throws ImaginaryFriendException
+	 * @throws ThisIsntMutualException
+	 */
 	private void receiveAddressBook() throws IOException,
 			ImaginaryFriendException, ThisIsntMutualException {
 		StringBuilder sb = new StringBuilder();
@@ -311,20 +401,9 @@ public class Client {
 		}
 	}
 
-	private String getConfirmation() throws IOException {
-		StringBuilder sb = new StringBuilder();
-
-		int content = inputStream.read();
-		while (content != -1 && content != 10) {
-			sb.append((char) content);
-			content = inputStream.read();
-		}
-		return sb.toString();
-
-	}
-
 	/**
 	 * @param args
+	 *            - <filename> <port>
 	 * @throws ThisIsntMutualException
 	 * @throws ImaginaryFriendException
 	 * @throws ParseException
@@ -333,9 +412,10 @@ public class Client {
 	public static void main(String[] args) throws ParseException,
 			ImaginaryFriendException, ThisIsntMutualException, IOException {
 		String filePath = args[0];
-		Integer _port = Integer.parseInt(args[1]);
+		String host = args[1];
+		Integer _port = Integer.parseInt(args[2]);
 
-		Client c = new Client(filePath, _port);
+		Client c = new Client(filePath, host, _port);
 		c.dialog();
 
 	}

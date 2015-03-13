@@ -135,7 +135,7 @@ public class Server {
 	}
 
 	/**
-	 * @param args
+	 * @param args - <filename> <port>
 	 * @throws ThisIsntMutualException
 	 * @throws ImaginaryFriendException
 	 * @throws ParseException

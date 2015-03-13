@@ -72,7 +72,6 @@ public class AddressBook {
 	 */
 	public Group nameToGroup(String name) {
 		return this.nameToGroup.get(name);
-
 	}
 
 	/**
