@@ -177,17 +177,21 @@ public class Server {
 	 */
 	public static void main(String[] args) {
 		try {
-			Integer p = Integer.parseInt(args[1]);
-			String fileName = args[0];
-			Server s = new Server(fileName, p);
-			s.listen();
-
+			if(args.length == 2){
+				Integer p = Integer.parseInt(args[1]);
+				String fileName = args[0];
+				Server s = new Server(fileName, p);
+				s.listen();				
+			} else {
+				System.out.println("Usage: <filpath> <port_number>");
+			}
+		} catch (FileNotFoundException e){
+			System.out.println("File not found! Usage: <filepath> <port_number>");
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			System.out.println("Socket was occupied!");
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("Usage: <filepath> <port_number>");
 		}
 
 	}

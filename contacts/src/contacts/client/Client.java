@@ -433,7 +433,7 @@ public class Client {
 
 	/**
 	 * @param args
-	 *            - <filename> <port>
+	 *            - <filename> <host> <port>
 	 * @throws ThisIsntMutualException
 	 * @throws ImaginaryFriendException
 	 * @throws ParseException
@@ -441,12 +441,26 @@ public class Client {
 	 */
 	public static void main(String[] args) throws ParseException,
 			ImaginaryFriendException, ThisIsntMutualException, IOException {
-		String filePath = args[0];
-		String host = args[1];
-		Integer _port = Integer.parseInt(args[2]);
-
-		Client c = new Client(filePath, host, _port);
-		c.dialog();
-
+		
+		try{
+			if(args.length == 3){
+				String filePath = args[0];
+				String host = args[1];
+				Integer _port = Integer.parseInt(args[2]);		
+				Client c = new Client(filePath, host, _port);
+				c.dialog();		
+			} else {
+				System.out.println("Usage: <filename> <host_name> <port_number>");
+			}
+		} catch (NumberFormatException e) {
+			System.out.println("Please input a valid number!");
+			System.out.println("Usage: <filename> <host_name> <port_number>");
+		} catch (UnknownHostException e) {
+			System.out.println("Input valid host name next time!");
+		} catch (FileNotFoundException e) {
+			System.out.println("Input a valid file name next time!");
+		} catch (Exception e) {
+			System.out.println("Usage: <filename> <host_name> <port_number>");
+		}
 	}
 }
