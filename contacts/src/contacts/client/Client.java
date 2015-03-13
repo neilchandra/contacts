@@ -336,31 +336,45 @@ public class Client {
 			break;
 		case "pull":
 
-			sendToServer("PULL");
 			try {
+				sendToServer("PULL");
 				receiveAddressBook();
 			} catch (ImaginaryFriendException e) {
 				System.out
 						.println("address book was not received: ImaginaryFriendException");
+			} catch (ConnectException e){
+				System.out.println("Couldn't connect to Server!");
 			}
 			System.out.println("new: " + addressBook.toXML());
 
 			break;
 		case "push":
-			sendToServer("PUSH");
-			getServerOutput();
+			try {
+				sendToServer("PUSH");
+				getServerOutput();
+			} catch (ConnectException e) {
+				System.out.println("Couldn't connect to Server!");
+			}
 			break;
 		case "query path":
-			queryFirst = getCommand("Person 1: ");
-			querySecond = getCommand("Person 2: ");
-			sendToServer("QUERY PATH");
-			getServerOutput();
+			try {
+				queryFirst = getCommand("Person 1: ");
+				querySecond = getCommand("Person 2: ");
+				sendToServer("QUERY PATH");
+				getServerOutput();
+			} catch (ConnectException e) {
+				System.out.println("Couldn't connect to Server!");
+			}
 			break;
 		case "query mutual":
-			queryFirst = getCommand("Person 1: ");
-			querySecond = getCommand("Person 2: ");
-			sendToServer("QUERY MUTUAL");
-			getServerOutput();
+			try {
+				queryFirst = getCommand("Person 1: ");
+				querySecond = getCommand("Person 2: ");
+				sendToServer("QUERY MUTUAL");
+				getServerOutput();
+			} catch (ConnectException e) {
+				System.out.println("Couldn't connect to Server!");
+			}
 			break;
 		case "quit":
 			finished = true;
