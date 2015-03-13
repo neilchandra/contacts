@@ -1,0 +1,58 @@
+Table of contacts
+1. Pushing and pulling, overwriting an address book
+2. Querying mutual and shortest 
+3. No path between contacts
+
+
+********************************** 1 **********************************
+console:
+server received: PUSH
+server sent:PUSH CALLED
+server received: <addressBook><group name="Wayland"><group name="North Wayland"><contact><name>Neil</name><number>77</number><ownid>2424122</ownid><friends><id>-1128342808</id></friends></contact></group><group name="South Wayland"><group name="3rd Floor"><contact><name>Sam</name><number>9</number><ownid>82879</ownid><friends><id>-1128342808</id></friends></contact></group><contact><name>Mitchell</name><number>8888</number><ownid>-1128342808</ownid><friends><id>82879</id> <id>2424122</id></friends></contact></group></group></addressBook>
+old ab: <addressBook><group name="Friends"><group name="wayland people"><contact><name>Ally</name><number>1800-204-smor</number><ownid>1</ownid><friends><id>6</id></friends></contact><contact><name>Mitchell</name><number>1800-204-smor</number><ownid>2</ownid><friends><id>6</id></friends></contact><contact><name>Sam</name><number>1800-204-smor</number><ownid>3</ownid><friends><id>6</id></friends></contact></group><contact><name>Jo</name><number>1800-204-smor</number><ownid>4</ownid><friends><id>6</id></friends></contact><group name="crew people"><contact><name>Bayley</name><number>1800-204-1234</number><ownid>5</ownid><friends><id>6</id></friends></contact><contact><name>Luke</name><number>1800-204-1234</number><ownid>6</ownid><friends><id>1</id> <id>2</id> <id>3</id> <id>4</id> <id>5</id></friends></contact><group name="still on crew"><contact><name>Dana</name><number>1800-204-smor</number><ownid>7</ownid><friends></friends></contact></group></group></group></addressBook>
+new ab: <addressBook><group name="Wayland"><group name="North Wayland"><contact><name>Neil</name><number>77</number><ownid>2424122</ownid><friends><id>-1128342808</id></friends></contact></group><group name="South Wayland"><group name="3rd Floor"><contact><name>Sam</name><number>9</number><ownid>82879</ownid><friends><id>-1128342808</id></friends></contact></group><contact><name>Mitchell</name><number>8888</number><ownid>-1128342808</ownid><friends><id>82879</id> <id>2424122</id></friends></contact></group></group></addressBook>
+server sent:OK
+server received: PULL
+server sent:<addressBook><group name="Wayland"><group name="North Wayland"><contact><name>Neil</name><number>77</number><ownid>2424122</ownid><friends><id>-1128342808</id></friends></contact></group><group name="South Wayland"><group name="3rd Floor"><contact><name>Sam</name><number>9</number><ownid>82879</ownid><friends><id>-1128342808</id></friends></contact></group><contact><name>Mitchell</name><number>8888</number><ownid>-1128342808</ownid><friends><id>82879</id> <id>2424122</id></friends></contact></group></group></addressBook>
+
+********************************** 2 **********************************
+
+server received: QUERY MUTUAL
+server sent:QUERY MUTUAL CALLED
+server received: Sam
+Neil
+server sent:Mitchell
+
+server received: QUERY MUTUAL
+server sent:QUERY MUTUAL CALLED
+server received: Sam
+Mitchell
+server sent:no mutual friends
+server received: QUERY PATH
+server sent:QUERY PATH CALLED
+server received: Sam
+Neil
+server sent:Sam
+Mitchell
+Neil
+
+********************************** 3 **********************************
+
+server received: PUSH
+server sent:PUSH CALLED
+server received: <addressBook><group name="Wayland"><group name="North Wayland"><contact><name>Neil</name><number>77</number><ownid>2424122</ownid><friends></friends></contact></group><group name="South Wayland"><group name="3rd Floor"><contact><name>Sam</name><number>9</number><ownid>82879</ownid><friends></friends></contact></group></group></group></addressBook>
+old ab: <addressBook><group name="Wayland"><group name="North Wayland"><contact><name>Neil</name><number>77</number><ownid>2424122</ownid><friends><id>-1128342808</id></friends></contact></group><group name="South Wayland"><group name="3rd Floor"><contact><name>Sam</name><number>9</number><ownid>82879</ownid><friends><id>-1128342808</id></friends></contact></group><contact><name>Mitchell</name><number>8888</number><ownid>-1128342808</ownid><friends><id>82879</id> <id>2424122</id></friends></contact></group></group></addressBook>
+new ab: <addressBook><group name="Wayland"><group name="North Wayland"><contact><name>Neil</name><number>77</number><ownid>2424122</ownid><friends></friends></contact></group><group name="South Wayland"><group name="3rd Floor"><contact><name>Sam</name><number>9</number><ownid>82879</ownid><friends></friends></contact></group></group></group></addressBook>
+server sent:OK
+server received: QUERY PATH
+server sent:QUERY PATH CALLED
+server received: Sam
+Neil
+server sent:no path between contacts
+server received: PULL
+server sent:<addressBook><group name="Wayland"><group name="North Wayland"><contact><name>Neil</name><number>77</number><ownid>2424122</ownid><friends></friends></contact></group><group name="South Wayland"><group name="3rd Floor"><contact><name>Sam</name><number>9</number><ownid>82879</ownid><friends></friends></contact></group></group></group></addressBook>
+quit
+
+Final State of file:
+
+<addressBook><group name="Wayland"><group name="North Wayland"><contact><name>Neil</name><number>77</number><ownid>2424122</ownid><friends></friends></contact></group><group name="South Wayland"><group name="3rd Floor"><contact><name>Sam</name><number>9</number><ownid>82879</ownid><friends></friends></contact></group></group></group></addressBook>

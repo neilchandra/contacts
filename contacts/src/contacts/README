@@ -1,0 +1,24 @@
+1. The name of our main class is Client
+2. First, an XMLParser parser the file given in the command line arguments. It does this
+recursively using the LL1 grammer, classifying everything as a Top Group List, Group Helper, 
+Sub Group List, Contact, etc. As the XMLParser is parsing the file, it stores a hash map of names
+to contacts, names to groups, and ids to contacts. Each time a new contact is added it checks if the
+hashmap contains the key corresponding to the id or name as names and ids must be unique. In addition
+to storing a hash map a an array list of all contact names is stored. Once these data structures are
+created they are transferred to the actual address book which runs further methods to check that all
+friendships are mutual and that no contacts are friends with contacts that don't exist. We have created
+exceptions to deal with such errors. It is in this address book where methods are found that add contacts,
+remove contacts, list subgroups, etc. When a graph is created, it is initialized through a string of xml
+which is used to create an address book which the graph keeps reference to. The graph calls the method
+buildGraph() within the address book and passes a reference to itself. The address book then goes through
+all contacts and adds them as nodes. After all of them has been added as nodes all of their children are
+then added. In the client an infinite loop in the method "dialogue" gets the users output and acts accordingly,
+pushing and pulling the xml string to/from the client when indicated, adding groups, contacts, etc. All user
+inputs that throw a parse exception or any other exception are caught and handled, so that the user never sees
+the print stack trace. 
+3. Possible bugs: spiders and catapillers, not really sure if these are bugs or not.
+4. Nobody. We have no friends.
+5. The graph class, address book class, and xmlparser class all have a static methods each called in a the
+TestCases class. these test cases cover most aspects of parsing, removing and adding groups, contacts, finding
+the shortest path, mutual friends, etc. The client and server are tested primarily through system testing. These tests
+are documented in text files, which shows the console as well as the xml files used. 

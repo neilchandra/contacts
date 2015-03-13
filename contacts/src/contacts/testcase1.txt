@@ -1,0 +1,173 @@
+Initial state of text file: <addressBook> </addressBook>
+Table of contents of test
+1. Adding new contacts, and creating the new groups for the contact
+2. Pushing to server
+3. Querying mutual
+4. Removing contacts
+5. Attempting to remove non-existent contacts
+6. Creating and adding contacts to subgroups, and subgroups of subgroups.
+7. Pushing and querying path
+8. Querying with invalid names
+9. Final xml string is correct
+
+
+ ********************************** 1 **********************************
+ 
+Console:
+<addressBook></addressBook>
+Input a command:add
+name: Mitchell
+number: 1818
+friends (separate by ", "): 
+Current Group: none
+(1) new group  
+Please input a number between 1 and 1
+index: 1
+Group Name: CS18 Students
+Input a command:Add
+name: Neil
+number: 1234
+friends (separate by ", "): Mitchell
+Current Group: none
+(1) CS18 Students  (2) new group  
+Please input a number between 1 and 2
+index: 1
+Current Group: CS18 Students
+(1) new group  (2) current group
+Please input a number between 1 and 2
+index: 2
+Input a command:Add
+name: Zach
+number: 1234
+friends (separate by ", "): Mitchell, Neil
+Current Group: none
+(1) CS18 Students  (2) new group  
+Please input a number between 1 and 2
+index: 2
+Group Name: CS18 TAs
+
+********************************** 2 **********************************
+
+Input a command:push
+OK
+
+********************************** 3 **********************************
+
+Input a command:query mutual
+Person 1: Mitchell
+Person 2: Neil
+Zach
+
+Input a command:query mutual
+Person 1: Mitchell
+Person 2: Zach
+Neil
+
+********************************** 4 **********************************
+
+Input a command:remove
+name: Zach
+Input a command:remove
+name: Mitchell
+Input a command:remove
+name: Neil
+
+********************************** 5 **********************************
+
+Input a command:remove
+name: non-existent name
+non-existent name couldn't be removed!
+
+********************************** 6 **********************************
+
+Input a command:add
+name: Luke
+number: 1234
+friends (separate by ", "): 
+Current Group: none
+(1) CS18 TAs  (2) CS18 Students  (3) new group  
+Please input a number between 1 and 3
+index: 3
+Group Name: Non-CS
+Input a command:add
+name: Sam
+number: 3333
+friends (separate by ", "): Luke
+Current Group: none
+(1) Non-CS  (2) CS18 TAs  (3) CS18 Students  (4) new group  
+Please input a number between 1 and 4
+index: 3
+Current Group: CS18 Students
+(1) new group  (2) current group
+Please input a number between 1 and 2
+index: 1
+Group Name: CS concentrators
+Input a command:add
+name: Ally
+number: 44
+friends (separate by ", "): Sam
+Current Group: none
+(1) Non-CS  (2) CS18 TAs  (3) CS18 Students  (4) new group  
+Please input a number between 1 and 4
+index: 1
+Current Group: Non-CS
+(1) new group  (2) current group
+Please input a number between 1 and 2
+index: 1
+Group Name: History Concentrators
+Input a command:add
+name: Dana
+number: 6789
+friends (separate by ", "): Ally
+Current Group: none
+(1) Non-CS  (2) CS18 TAs  (3) CS18 Students  (4) new group  
+Please input a number between 1 and 4
+index: 1
+Current Group: Non-CS
+(1) History Concentrators  (2) new group  (3) current group
+Please input a number between 1 and 3
+index: 1
+Current Group: History Concentrators
+(1) new group  (2) current group
+Please input a number between 1 and 2
+index: 1
+Group Name: Crew Team
+
+********************************** 7 **********************************
+
+Input a command:push
+OK
+Input a command:query path
+Person 1: Dana
+Person 2: Luke
+Dana
+Ally
+Sam
+Luke
+
+Input a command:query path
+Person 1: Luke
+Person 2: Dana
+Luke
+Sam
+Ally
+Dana
+
+Input a command:query mutual
+Person 1: Dana
+Person 2: Ally
+no mutual friends
+
+********************************** 8 **********************************
+
+Input a command:query mutual
+Person 1: invalid-name
+Person 2: other-invalid-name
+Invalid inputs
+Input a command:quit
+Goodbye!
+
+********************************** 9 **********************************
+
+Final state of file:
+<addressBook><group name="Non-CS"><group name="History Concentrators"><group name="Crew Team"><contact><name>Dana</name><number>6789</number><ownid>2122512</ownid><friends><id>2043672</id></friends></contact></group><contact><name>Ally</name><number>44</number><ownid>2043672</ownid><friends><id>2122512</id> <id>82879</id></friends></contact></group><contact><name>Luke</name><number>1234</number><ownid>2379971</ownid><friends><id>82879</id></friends></contact></group><group name="CS18 TAs"></group><group name="CS18 Students"><group name="CS concentrators"><contact><name>Sam</name><number>3333</number><ownid>82879</ownid><friends><id>2043672</id> <id>2379971</id></friends></contact></group></group></addressBook>
