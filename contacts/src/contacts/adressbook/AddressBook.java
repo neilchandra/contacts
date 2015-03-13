@@ -3,6 +3,7 @@ package contacts.adressbook;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 import contacts.parser.*;
 import contacts.parser.Number;
@@ -149,6 +150,10 @@ public class AddressBook {
 			throws ParseException, ImaginaryFriendException {
 		if (this.idToContact.containsKey(id)) {
 			System.out.println("IDs must be unique");
+			throw new ParseException();
+		}
+		if (this.nameToContact.containsKey(name)){
+			System.out.println("Names must be unique");
 			throw new ParseException();
 		}
 		Name theName = new Name(name);
@@ -304,8 +309,14 @@ public class AddressBook {
 	 * @param contactName
 	 * @return
 	 */
-	public int nameToInt(String contactName) {
-		return this.nameToContact.get(contactName).getID();
+	public int nameToInt(String contactName) throws NoSuchElementException {
+		Contact contact = this.nameToContact.get(contactName);
+		if(contact == null){
+			throw new NoSuchElementException();
+		} else {
+			return contact.getID();
+		}
+
 	}
 
 	/**

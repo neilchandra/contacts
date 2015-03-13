@@ -2,6 +2,7 @@ package contacts.client;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 import contacts.adressbook.*;
 import contacts.parser.*;
@@ -28,10 +29,13 @@ public class Client {
 
 	/** The local copy of the address book */
 	private AddressBook addressBook;
-
+	
+	
 	private String queryFirst, querySecond;
 
 	private int port;
+
+	private boolean groupSelected;
 
 	public Client(String filePath, int _port) throws IOException,
 			ParseException, ImaginaryFriendException, ThisIsntMutualException {
@@ -91,6 +95,54 @@ public class Client {
 		}
 	}
 
+	private int getGroupIndex(int end) throws IOException {
+		System.out.println("Please input a number between 1 and " + end);
+		String selectedGroup = getCommand("index: ");
+
+		try {
+			int groupIndex = Integer.parseInt(selectedGroup);
+			while (groupIndex <= 0 || groupIndex > end) {
+				System.out
+						.println("Please input a number between 1 and " + end);
+				selectedGroup = getCommand("index: ");
+				groupIndex = Integer.parseInt(selectedGroup);
+			}
+			return groupIndex;
+		} catch (NumberFormatException e) {
+			getGroupIndex(end);
+		}
+		groupSelected = true;
+
+		return 0;
+	}
+	
+	private Group getGroup(int depth, String current){
+
+		ArrayList<Group> group;
+		if(depth == 0){
+			group = addressBook.listGroups();
+			System.out.println("Current Group: none");
+		}
+		else{
+			group = addressBook.listSubGroups(current);
+			System.out.println("Current Group "+current);
+		}
+		
+		int counter = 0;
+		for(Group g : group) {
+			System.out.println("("+(counter+1)+") "+g.getName());
+			counter++;
+		}
+		System.out.print("(" + counter + ") new group  ");
+		if (depth > 0) {
+			counter++;
+			System.out.print("(" + counter + ") current group");
+		} 
+		System.out.println("");; //newline
+				
+		return null;
+	}
+
 	private void getUserInput() throws IOException, ThisIsntMutualException {
 
 		// Read command in and break in words
@@ -102,7 +154,82 @@ public class Client {
 		case "add":
 			String person = getCommand("name: ");
 			String number = getCommand("number: ");
-			String friendsString = getCommand("friends: ");
+			String friendsString = getCommand("friends (separate by \", \"): ");
+			
+			groupSelected = false;
+			
+			
+			int counter;
+			int depthCounter = 0;
+
+			ArrayList<Group> group = addressBook.listGroups();
+			System.out.println("Current Group: none");
+			Group currentGroup = null;
+			
+			while (!groupSelected) {
+				int groupSize = group.size();
+
+				counter = 1;
+				System.out
+						.println("Which group would you like to add this contact to?");
+				for (Group g : group) {
+					System.out.print("(" + counter + ") " + g.getName() + "  ");
+					counter++;
+				}
+
+				System.out.print("(" + counter + ") new group  ");
+				if (depthCounter > 0) {
+					counter++;
+					System.out.print("(" + counter + ") current group");
+				} 
+				System.out.println("");; //newline
+				int selectedGroup = getGroupIndex(counter);
+				
+				if(groupSize == 0 && selectedGroup == groupSize + 1){					
+					String groupName = getCommand("Group name: ");
+					groupSelected = true;
+					if(currentGroup != null){
+						try {
+							//add new group!
+							addressBook.addGroup(groupName, currentGroup.getName());
+						} catch (ParseException e) {
+							System.out.println("Couldn't create group!");
+						}
+					} 
+				} else if (selectedGroup < groupSize + 1) {
+					depthCounter++;
+					currentGroup = group.get(selectedGroup - 1);
+					System.out.println("Current Group: " + currentGroup.getName());
+					group = currentGroup.listSubGroups();
+				} else if (depthCounter == 0
+						&& selectedGroup == groupSize + 1) {
+					String groupName = getCommand("Group name: ");
+					groupSelected = true;
+					if(currentGroup != null){
+						try {
+							//add new group!
+							addressBook.addGroup(groupName, currentGroup.getName());
+						} catch (ParseException e) {
+							System.out.println("Couldn't create group!");
+						}
+					} else {
+						try {
+							//add new group!
+							addressBook.addGroup(groupName);
+						} catch (ParseException e) {
+							System.out.println("Couldn't create group!");
+						}
+					}
+					// create new group and insert there
+				} else if (depthCounter > 0
+						&& selectedGroup == groupSize + 2) {
+					//current group code
+					groupSelected = true;
+					System.out.println("to add in "+currentGroup.getName());
+				}
+			} //end while
+			
+
 			break;
 		case "remove":
 			// prompts for name of contact to be deleted
@@ -133,12 +260,8 @@ public class Client {
 
 			break;
 		case "push":
-			// writes Client version of addressbook to XML
-			// sends that XML version to the server
 			sendToServer("PUSH");
 			getServerOutput();
-			// sendToServer(addressBook.toXML());
-
 			System.out.println(getConfirmation());
 			break;
 		case "query path":

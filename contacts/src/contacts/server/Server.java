@@ -4,10 +4,8 @@ import java.io.*;
 import java.net.*;
 import java.util.NoSuchElementException;
 
-import contacts.adressbook.*;
 import contacts.parser.ImaginaryFriendException;
 import contacts.parser.ParseException;
-import contacts.parser.ParsedAddressBook;
 import contacts.parser.ThisIsntMutualException;
 import contacts.parser.XMLParser;
 
@@ -53,7 +51,6 @@ public class Server {
 					System.out.println("old ab: "+graph.toXML());
 					graph = new Graph(xml);
 					System.out.println("new ab: "+graph.toXML());
-
 					reply = "OK";
 				} catch (ParseException e){
 					reply = "ERROR";
