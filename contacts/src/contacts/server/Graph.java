@@ -50,7 +50,6 @@ public class Graph implements IGraph {
 			return (new Graph(this.toXML())).nodes;
 		} catch (ImaginaryFriendException | ThisIsntMutualException
 				| ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

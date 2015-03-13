@@ -3,6 +3,7 @@ package contacts.client;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import contacts.adressbook.*;
 import contacts.parser.*;
@@ -29,8 +30,7 @@ public class Client {
 
 	/** The local copy of the address book */
 	private AddressBook addressBook;
-	
-	
+
 	private String queryFirst, querySecond;
 
 	private int port;
@@ -96,51 +96,110 @@ public class Client {
 	}
 
 	private int getGroupIndex(int end) throws IOException {
-		System.out.println("Please input a number between 1 and " + end);
+		System.out.println("Please input a number between 1 and " + (end + 1));
 		String selectedGroup = getCommand("index: ");
 
 		try {
 			int groupIndex = Integer.parseInt(selectedGroup);
-			while (groupIndex <= 0 || groupIndex > end) {
-				System.out
-						.println("Please input a number between 1 and " + end);
+			
+			while (groupIndex < 1 || groupIndex > (end + 1)) {
+				System.out.println("received groupindex of :" + groupIndex);
+				System.out.println("Please input a number between 1 and "
+						+ (end + 1));
 				selectedGroup = getCommand("index: ");
 				groupIndex = Integer.parseInt(selectedGroup);
 			}
-			return groupIndex;
+			return groupIndex  - 1;
 		} catch (NumberFormatException e) {
 			getGroupIndex(end);
 		}
 		groupSelected = true;
 
-		return 0;
+		return -1;
 	}
-	
-	private Group getGroup(int depth, String current){
+
+	private Group getGroup(int depth, String current) throws IOException {
+		System.out.println(addressBook.nameToGroup(current));
 
 		ArrayList<Group> group;
-		if(depth == 0){
+		if (depth == 0) {
 			group = addressBook.listGroups();
 			System.out.println("Current Group: none");
-		}
-		else{
+		} else {
 			group = addressBook.listSubGroups(current);
-			System.out.println("Current Group "+current);
+			System.out.println("Current Group: " + current);
 		}
-		
+		int groupSize;
 		int counter = 0;
-		for(Group g : group) {
-			System.out.println("("+(counter+1)+") "+g.getName());
-			counter++;
+		if(group != null){
+			groupSize = group.size();
+			for (Group g : group) {
+				System.out.print("(" + (counter + 1) + ") " + g.getName() + "  ");
+				counter++;
+			}
+		} else {
+			groupSize = 0;
 		}
-		System.out.print("(" + counter + ") new group  ");
+
+		System.out.print("(" + (counter + 1) + ") new group  ");
+		
+		
 		if (depth > 0) {
 			counter++;
-			System.out.print("(" + counter + ") current group");
-		} 
-		System.out.println("");; //newline
-				
+			System.out.print("(" + (counter + 1) + ") current group");
+		}
+		System.out.println(""); // newline
+
+		int groupIndex = getGroupIndex(counter);
+
+		if (groupIndex == groupSize) { // create new group
+			String groupName = getCommand("Group Name: ");
+			try {
+				if (depth == 0) {
+					addressBook.addGroup(groupName);
+					if (addressBook.nameToGroup(groupName) != null)
+						return addressBook.nameToGroup(groupName);
+					else
+						System.out.println("Error in adding group!");
+				} else
+					addressBook.addGroup(groupName, current);
+				if (addressBook.nameToGroup(groupName) != null)
+					return addressBook.nameToGroup(groupName);
+				else
+					System.out.println("Error in adding group!");
+			} catch (ParseException e) {
+				System.out.println("Group couldn't be created!");
+			}
+		} else if (depth > 0 && groupIndex == groupSize + 1) { // current group
+			Group toReturn = addressBook.nameToGroup(current);
+			if(toReturn == null)
+				System.out.println("Group couldn't be passed!");
+			else
+				return toReturn;
+		} else if (groupIndex < groupSize && group != null) {
+			return getGroup(depth + 1, group.get(groupIndex).getName());
+		}
+
+		//return null if things go wrong
 		return null;
+	}
+
+	private int[] getFriends() throws IOException {
+		String friendString = getCommand("friends (separate by \", \"): ");
+		if (friendString.equals("")) {
+			return new int[0];
+		}
+		String[] friends = friendString.split(", ");
+		int[] friendsID = new int[friends.length];
+		for (int i = 0; i < friends.length; i++) {
+			try {
+				friendsID[i] = addressBook.nameToInt(friends[i]);
+			} catch (NoSuchElementException e) {
+				System.out.println("No contact found called " + friends[i]);
+				getFriends();
+			}
+		}
+		return friendsID;
 	}
 
 	private void getUserInput() throws IOException, ThisIsntMutualException {
@@ -154,81 +213,20 @@ public class Client {
 		case "add":
 			String person = getCommand("name: ");
 			String number = getCommand("number: ");
-			String friendsString = getCommand("friends (separate by \", \"): ");
-			
-			groupSelected = false;
-			
-			
-			int counter;
-			int depthCounter = 0;
-
-			ArrayList<Group> group = addressBook.listGroups();
-			System.out.println("Current Group: none");
-			Group currentGroup = null;
-			
-			while (!groupSelected) {
-				int groupSize = group.size();
-
-				counter = 1;
-				System.out
-						.println("Which group would you like to add this contact to?");
-				for (Group g : group) {
-					System.out.print("(" + counter + ") " + g.getName() + "  ");
-					counter++;
+			int[] friends = getFriends();
+			Group g = getGroup(0, null);
+			if(g == null){
+				System.out.println("Couldn't add contact!");
+			} else {
+				try {
+					Contact c = addressBook.makeContact(person, number, person.hashCode(), friends);
+					addressBook.addContact(c, g.getName());
+				} catch (ParseException e) {
+					System.out.println("Couldn't create Contact, parse error!");
+				} catch (ImaginaryFriendException e) {
+					System.out.println("Couldn't create Contact, friend error!");
 				}
-
-				System.out.print("(" + counter + ") new group  ");
-				if (depthCounter > 0) {
-					counter++;
-					System.out.print("(" + counter + ") current group");
-				} 
-				System.out.println("");; //newline
-				int selectedGroup = getGroupIndex(counter);
-				
-				if(groupSize == 0 && selectedGroup == groupSize + 1){					
-					String groupName = getCommand("Group name: ");
-					groupSelected = true;
-					if(currentGroup != null){
-						try {
-							//add new group!
-							addressBook.addGroup(groupName, currentGroup.getName());
-						} catch (ParseException e) {
-							System.out.println("Couldn't create group!");
-						}
-					} 
-				} else if (selectedGroup < groupSize + 1) {
-					depthCounter++;
-					currentGroup = group.get(selectedGroup - 1);
-					System.out.println("Current Group: " + currentGroup.getName());
-					group = currentGroup.listSubGroups();
-				} else if (depthCounter == 0
-						&& selectedGroup == groupSize + 1) {
-					String groupName = getCommand("Group name: ");
-					groupSelected = true;
-					if(currentGroup != null){
-						try {
-							//add new group!
-							addressBook.addGroup(groupName, currentGroup.getName());
-						} catch (ParseException e) {
-							System.out.println("Couldn't create group!");
-						}
-					} else {
-						try {
-							//add new group!
-							addressBook.addGroup(groupName);
-						} catch (ParseException e) {
-							System.out.println("Couldn't create group!");
-						}
-					}
-					// create new group and insert there
-				} else if (depthCounter > 0
-						&& selectedGroup == groupSize + 2) {
-					//current group code
-					groupSelected = true;
-					System.out.println("to add in "+currentGroup.getName());
-				}
-			} //end while
-			
+			}
 
 			break;
 		case "remove":

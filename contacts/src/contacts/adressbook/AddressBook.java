@@ -64,6 +64,16 @@ public class AddressBook {
 			return ab.toXML().equals(this.toXML());
 		}
 	}
+	
+	/**
+	 * given a name, returns a group
+	 * 
+	 * @return the group corresponding to the name
+	 */
+	public Group nameToGroup(String name) {
+		return this.nameToGroup.get(name);
+
+	}
 
 	/**
 	 * Adds a contact to a group with groupName g
