@@ -50,10 +50,15 @@ public class Client {
 	 *             - friendship not symmetric
 	 */
 	public Client(String _filePath, String _host, int _port) throws IOException,
-			ImaginaryFriendException, ThisIsntMutualException, ParseException {
+			ImaginaryFriendException, ThisIsntMutualException {
 		filePath = _filePath;
 		host = _host;
-		addressBook = new AddressBook(XMLParser.parse(filePath));
+		try {
+			addressBook = new AddressBook(XMLParser.parse(filePath));
+		} catch (Exception e) {
+			System.out.println("Client couldn't parse XML file!");
+			System.exit(0);
+		}
 		port = _port;
 		userReader = new BufferedReader(new InputStreamReader(System.in));
 		finished = false;
@@ -248,17 +253,14 @@ public class Client {
 	}
 
 	/**
-	 * Gets ID's for
+	 * Gets ID's for friends
 	 * 
 	 * @return - an array of ints representing legal Contacts
 	 * @throws IOException
 	 *             - if getCommand fails
 	 */
 	private int[] getFriends() throws IOException {
-		String friendString = getCommand("friends (separate by \", \"): ");
-		if (friendString.equals("")) {
-			return new int[0];
-		}
+		String friendString = getCommand("friends (separate by \", \"): ");		
 		String[] friends = friendString.split(", ");
 		int[] friendsID = new int[friends.length];
 		for (int i = 0; i < friends.length; i++) {
@@ -266,7 +268,7 @@ public class Client {
 				friendsID[i] = addressBook.nameToInt(friends[i]);
 			} catch (NoSuchElementException e) {
 				System.out.println("No contact found called " + friends[i]);
-				getFriends();
+				return getFriends();
 			}
 		}
 		return friendsID;
