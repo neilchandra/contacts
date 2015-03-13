@@ -155,6 +155,7 @@ public class XMLParser {
 				System.out.println("Group names must be unique");
 				throw new ParseException();
 			}
+			nameToGroup.put(groupName, sg);
 			return sg;
 		} else {
 			return new SubGroupList(parseGroupHelper());
