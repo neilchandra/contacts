@@ -255,6 +255,7 @@ public class Graph implements IGraph {
 				| ParseException e) {
 			e.printStackTrace();
 		}
-		System.out.println(g.shortestPath("Timmy", "Neil").equals("Timmy\nSam\nMitch\nNeil\n"));
+		System.out.println(g.shortestPath("Timmy", "Neil").equals(
+				"Timmy\nSam\nMitch\nNeil\n"));
 	}
 }

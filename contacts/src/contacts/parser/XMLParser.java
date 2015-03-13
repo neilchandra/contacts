@@ -201,7 +201,7 @@ public class XMLParser {
 		}
 		if (t.current() != null && t.current().kind == XMLConstants.TEXT) {
 			name = t.current().attribute;
-			if(nameToContact.containsKey(name)) {
+			if (nameToContact.containsKey(name)) {
 				System.out.println("name must be unique");
 				throw new ParseException();
 			}
@@ -525,6 +525,6 @@ public class XMLParser {
 			// should not be reachable code
 			System.out.println(false);
 		}
-		
+
 	}
 }

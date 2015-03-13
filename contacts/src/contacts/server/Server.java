@@ -49,6 +49,7 @@ public class Server {
 
 	/**
 	 * Listens to client inputs and responds
+	 * 
 	 * @throws ImaginaryFriendException
 	 * @throws ThisIsntMutualException
 	 * @throws IOException
@@ -111,8 +112,11 @@ public class Server {
 
 	/**
 	 * Sends a message to a client through a certain port
-	 * @param message - the String to be sent
-	 * @param sock - the socket in which to interact
+	 * 
+	 * @param message
+	 *            - the String to be sent
+	 * @param sock
+	 *            - the socket in which to interact
 	 * @throws IOException
 	 */
 	private void sendToClient(String message, Socket sock) throws IOException {
@@ -125,6 +129,7 @@ public class Server {
 
 	/**
 	 * Receives input from da client
+	 * 
 	 * @return
 	 * @throws IOException
 	 */

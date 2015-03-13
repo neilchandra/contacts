@@ -8,8 +8,11 @@ import java.util.HashMap;
  * friends parseNode class
  */
 public class Friends implements ParseNode {
+	
 	private int friendsID;
 	private Friends friends;
+	
+	
 	/**
 	 * constructor
 	 * @param friendsID
@@ -19,6 +22,8 @@ public class Friends implements ParseNode {
 		this.friendsID = friendsID;
 		this.friends = friends;
 	}
+	
+	
 	@Override
 	public void toXML(StringBuilder sb) {
 		sb.append("<id>");
@@ -29,11 +34,13 @@ public class Friends implements ParseNode {
 			this.friends.toXML(sb);
 		}
 	}
+	
+	
 	/**
-	 * adds friends to a contact
-	 * @param idToContact a hash map of ids to contacts
-	 * @param idToFriends a hash map of ids to friends
-	 * @throws ImaginaryFriendException if a friend does not exist
+	 * Adds friends to a contact
+	 * @param idToContact - a hash map of ids to contacts
+	 * @param idToFriends - a hash map of ids to friends
+	 * @throws ImaginaryFriendException - if a friend does not exist
 	 */
 	public void addFriendsToContact(HashMap<Integer, Contact> idToContact,
 			HashMap<Integer, Contact> idToFriends) throws ImaginaryFriendException {
@@ -56,9 +63,11 @@ public class Friends implements ParseNode {
 			this.friends.addFriendsToContact(idToContact, idToFriends);
 		}
 	}
+	
+	
 	/**
-	 * adds all friends to an array
-	 * @param allFriends an array of friends
+	 * Adds all friends to an array
+	 * @param allFriends - an ArrayList of friends
 	 */
 	public void addAllFriends(ArrayList<Integer> allFriends) {
 		allFriends.add(friendsID);
@@ -66,8 +75,10 @@ public class Friends implements ParseNode {
 			this.friends.addAllFriends(allFriends);
 		}
 	}
+	
+	
 	/**
-	 * removes a friend 
+	 * Removes a friend
 	 * @param i the id of the friend
 	 * @param superFriend the preceeding friend
 	 */
@@ -78,12 +89,14 @@ public class Friends implements ParseNode {
 			this.friends.remove(i, this);
 		}
 	}
+	
 	/**
 	 * deletes the next friend
 	 */
 	public void deleteNext() {
 		this.friends = this.friends.next();
 	}
+	
 	/**
 	 * returns the next friend
 	 * @return the next friend
@@ -91,6 +104,7 @@ public class Friends implements ParseNode {
 	public Friends next() {
 		return this.friends;
 	}
+	
 	/**
 	 * returns the id of the current friend
 	 * @return an int representing id

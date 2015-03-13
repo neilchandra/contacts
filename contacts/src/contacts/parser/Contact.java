@@ -7,6 +7,8 @@ import java.util.HashMap;
  * contact class
  */
 public class Contact implements ParseNode {
+
+	/** Attributes */
 	private Name name;
 	private Number number;
 	private OwnID ownID;
@@ -14,13 +16,15 @@ public class Contact implements ParseNode {
 	private GroupHelper gh;
 	private HashMap<Integer, Contact> idToFriends;
 	private ArrayList<Integer> allFriends;
+
 	/**
-	 * constructor for a contact
+	 * Constructs a Contact out of a Name, Number, OwnID, Friend
+	 * 
 	 * @param name
 	 * @param number
 	 * @param ownID
 	 * @param friends
-	 * @throws ImaginaryFriendException 
+	 * @throws ImaginaryFriendException
 	 */
 	public Contact(Name name, Number number, OwnID ownID, Friends friends) {
 		this.name = name;
@@ -28,13 +32,17 @@ public class Contact implements ParseNode {
 		this.ownID = ownID;
 		this.friends = friends;
 	}
+
 	/**
-	 * sets the group helper of the contact
-	 * @param gh the group helper
+	 * Sets the group helper of the contact
+	 * 
+	 * @param gh
+	 *            the group helper
 	 */
-	public void setGroupHelper(GroupHelper gh){
+	public void setGroupHelper(GroupHelper gh) {
 		this.gh = gh;
 	}
+
 	@Override
 	public void toXML(StringBuilder sb) {
 		sb.append("<contact>");
@@ -48,107 +56,128 @@ public class Contact implements ParseNode {
 		this.ownID.toXML(sb);
 		sb.append("</ownid>");
 		sb.append("<friends>");
-		if(this.friends != null)
+		if (this.friends != null)
 			this.friends.toXML(sb);
 		sb.append("</friends>");
 		sb.append("</contact>");
 	}
+
 	/**
-	 * adds friends to the contact
+	 * Adds friends to the contact
+	 * 
 	 * @param idToContact
-	 * @throws ImaginaryFriendException if the friends do not exist
+	 * @throws ImaginaryFriendException
+	 *             if the friends do not exist
 	 */
-	public void addFriendsToContact(HashMap<Integer, Contact> idToContact) 
+	public void addFriendsToContact(HashMap<Integer, Contact> idToContact)
 			throws ImaginaryFriendException {
 		this.idToFriends = new HashMap<Integer, Contact>();
 		this.allFriends = new ArrayList<Integer>();
-		if(this.friends != null) {
+		if (this.friends != null) {
 			this.friends.addFriendsToContact(idToContact, idToFriends);
 			this.friends.addAllFriends(this.allFriends);
 		}
 	}
+
 	/**
-	 * returns the name of the contact
+	 * Returns the name of the contact
+	 * 
 	 * @return the name of the contact
 	 */
 	public String getName() {
 		return this.name.toString();
 	}
+
 	/**
-	 * returns the id of the contact 
-	 * @return the id of the contact 
+	 * Returns the id of the contact
+	 * 
+	 * @return the id of the contact
 	 */
 	public int getID() {
 		return ownID.getID();
 	}
+
 	/**
-	 * checks if all friend ships are mutual
+	 * Checks if all friend ships are mutual
+	 * 
 	 * @throws ThisIsntMutualException
 	 */
 	public void checkIfMutual() throws ThisIsntMutualException {
-		for(Integer i : this.allFriends) {
-			if(!this.idToFriends.get(i).isFriendsWith(getID())) {
+		for (Integer i : this.allFriends) {
+			if (!this.idToFriends.get(i).isFriendsWith(getID())) {
 				System.out.println("friendship is not mutual");
 				throw new ThisIsntMutualException();
 			}
-			if(i == this.getID()) {
+			if (i == this.getID()) {
 				System.out.println("Can't be friends with yourself!");
 				throw new ThisIsntMutualException();
 			}
 		}
 	}
+
 	/**
-	 * returns true if the contact is friends with the contact with id i
-	 * @param i the id of the other contact
+	 * Returns true if the contact is friends with the contact with id i
+	 * 
+	 * @param i
+	 *            the id of the other contact
 	 * @return true if they are friends, false otherwise
 	 */
 	private boolean isFriendsWith(Integer i) {
 		return this.idToFriends.containsKey(i);
 	}
+
 	/**
-	 * adds this contact as a friend for all mutual contacts
+	 * Adds this contact as a friend for all mutual contacts
 	 */
 	public void addMutualFriends() {
-		for(Integer i : this.allFriends) {
+		for (Integer i : this.allFriends) {
 			this.idToFriends.get(i).addFriend(this);
 		}
 	}
+
 	/**
-	 * adds contact as a friend
+	 * Adds contact as a friend
+	 * 
 	 * @param contact
 	 */
 	private void addFriend(Contact contact) {
 		int friendsID = contact.getID();
 		this.allFriends.add(friendsID);
 		this.idToFriends.put(friendsID, contact);
-		this.friends = new Friends(friendsID, this.friends);	
+		this.friends = new Friends(friendsID, this.friends);
 	}
+
 	/**
-	 * deletes this contact from all friends
+	 * Deletes this contact from all friends
 	 */
 	public void delete() {
-		for(Integer i : this.allFriends) {
+		for (Integer i : this.allFriends) {
 			Contact myFriend = this.idToFriends.get(i);
 			myFriend.removeContact(getID());
 		}
 		this.gh.deleteContact();
 	}
+
 	/**
-	 * remove's contact from memory
-	 * @param i the id of the contact to be removed from memory
+	 * Removes contact from memory
+	 * 
+	 * @param i
+	 *            the id of the contact to be removed from memory
 	 */
 	private void removeContact(Integer i) {
 		this.idToFriends.remove(i);
 		this.allFriends.remove(this.allFriends.lastIndexOf(i));
-		if(this.friends.getID() == i) {
+		if (this.friends.getID() == i) {
 			this.friends = this.friends.next();
 		} else {
 			this.friends.remove(i, null);
 		}
 	}
+
 	/**
-	 * returns an array list of all friends
-	 * @return an array list of all friends
+	 * Returns an ArrayList of all friends
+	 * 
+	 * @return an ArrayList of all friends
 	 */
 	public ArrayList<Integer> getAllFriends() {
 		return this.allFriends;

@@ -13,6 +13,8 @@ public class GroupHelper implements ParseNode {
 	private Contact contact;
 	private GroupHelper groupHelper;
 	private Boolean type1 = false;
+	
+	
 	/**
 	 * Constructor if containing subGroupList
 	 * @param subGroupList
@@ -21,6 +23,7 @@ public class GroupHelper implements ParseNode {
 		this.subGroupList = subGroupList;
 		type1 = true;
 	}
+	
 	/** 
 	 * constructor if not containing subGroupList
 	 * @param contact
@@ -30,6 +33,8 @@ public class GroupHelper implements ParseNode {
 		this.contact = contact;
 		this.groupHelper = groupHelper;
 	}
+	
+	
 	@Override
 	public void toXML(StringBuilder sb) {
 		if(type1) {
@@ -45,6 +50,8 @@ public class GroupHelper implements ParseNode {
 				this.groupHelper.toXML(sb);
 		}
 	}
+	
+	
 	/**
 	 * adds all groups
 	 * @param groups a hash map of strings to groups
@@ -56,6 +63,8 @@ public class GroupHelper implements ParseNode {
 			this.groupHelper.addAllGroups(groups);
 		}	
 	}
+	
+	
 	/**
 	 * lists all sub groups
 	 * @param subGroups an array list of subgroups
@@ -70,6 +79,8 @@ public class GroupHelper implements ParseNode {
 			return subGroups;
 		}
 	}
+	
+	
 	/**
 	 * provides a list of contacts
 	 * @param contacts a list of existing contacts
@@ -88,6 +99,8 @@ public class GroupHelper implements ParseNode {
 		}
 		return contacts;
 	}
+	
+	
 	/**
 	 * adds a contact
 	 * @param c the contact to be added
@@ -95,6 +108,8 @@ public class GroupHelper implements ParseNode {
 	public void addContact(Contact c) {
 		this.groupHelper = new GroupHelper(c, this.groupHelper);
 	}
+	
+	
 	/**
 	 * delets a contact
 	 */

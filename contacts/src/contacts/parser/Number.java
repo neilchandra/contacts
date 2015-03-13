@@ -6,8 +6,10 @@ package contacts.parser;
 public class Number implements ParseNode {
 
 	private String number;
+
 	/**
-	 * constructor 
+	 * Constructs a Number from a string
+	 * 
 	 * @param number
 	 */
 	public Number(String number) {
@@ -16,12 +18,14 @@ public class Number implements ParseNode {
 
 	@Override
 	public void toXML(StringBuilder sb) {
-		if(this.number != null)
+		if (this.number != null)
 			sb.append(this.number);
-		
+
 	}
+
 	/**
 	 * returns the number
+	 * 
 	 * @return the number
 	 */
 	public String getNumber() {

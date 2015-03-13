@@ -175,7 +175,7 @@ public class AddressBook {
 	}
 
 	/**
-	 * helper to make it possible to return a contact
+	 * Makes a Friends object out of an array of id's 
 	 * 
 	 * @param friendsID
 	 *            an array of the id of friends
@@ -184,15 +184,14 @@ public class AddressBook {
 	 * @return an instance of Friends
 	 */
 	private Friends makeFriends(int[] friendsID, int i) {
-		if (i < friendsID.length) {
+		if (i < friendsID.length) 
 			return new Friends(friendsID[i], makeFriends(friendsID, ++i));
-		} else {
+		else
 			return null;
-		}
 	}
 
 	/**
-	 * for testing, prints the addressbook
+	 * Prints the AddressBook, purely for testing purpose
 	 */
 	public void printAdressBook() {
 		for (Group g : listGroups()) {
@@ -204,7 +203,7 @@ public class AddressBook {
 	}
 
 	/**
-	 * for testing, prints sub groups of a group
+	 * Prints the sub groups of a group: for testing
 	 * 
 	 * @param g
 	 *            the group
@@ -219,7 +218,7 @@ public class AddressBook {
 	}
 
 	/**
-	 * for testing, prints the members of a group
+	 * Prints the members of a group, for testing mostly
 	 * 
 	 * @param g
 	 *            the group
@@ -232,7 +231,7 @@ public class AddressBook {
 	}
 
 	/**
-	 * adds a group
+	 * Adds a group to the address book
 	 * 
 	 * @param groupName
 	 *            the name of the group
@@ -247,7 +246,7 @@ public class AddressBook {
 	}
 
 	/**
-	 * adds a group as a subgroup of a supergroup
+	 * Adds a group as a subgroup of a supergroup
 	 * 
 	 * @param groupName
 	 *            the name of the group
@@ -269,9 +268,9 @@ public class AddressBook {
 	}
 
 	/**
-	 * removes a contact
+	 * Removes a contact from the Adddress book
 	 * 
-	 * @param contactName
+	 * @param contactName - the name of the contact to be removed
 	 * @throws ImaginaryFriendException
 	 *             if the contact doesn't exist
 	 */
@@ -292,7 +291,7 @@ public class AddressBook {
 	}
 
 	/**
-	 * builds a graph
+	 * Builds a graph from a a graph
 	 * 
 	 * @param graph
 	 *            the graph to build
@@ -313,9 +312,9 @@ public class AddressBook {
 	}
 
 	/**
-	 * converts from a contact name to their id
+	 * Maps from a contact name to an id
 	 * 
-	 * @param contactName
+	 * @param contactName - the key
 	 * @return
 	 */
 	public int nameToInt(String contactName) throws NoSuchElementException {
@@ -329,9 +328,9 @@ public class AddressBook {
 	}
 
 	/**
-	 * converts from a contact's own id to their name
+	 * Maps from a contact's own id to a name
 	 * 
-	 * @param ownID
+	 * @param ownID - the key
 	 * @return
 	 */
 	public String intToName(int ownID) {
