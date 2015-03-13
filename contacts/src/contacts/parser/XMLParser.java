@@ -200,6 +200,10 @@ public class XMLParser {
 		}
 		if (t.current() != null && t.current().kind == XMLConstants.TEXT) {
 			name = t.current().attribute;
+			if(nameToContact.containsKey(name)) {
+				System.out.println("name must be unique");
+				throw new ParseException();
+			}
 			t.advance();
 		}
 		if (t.current() != null && t.current().kind == XMLConstants.CLOSENAME) {
