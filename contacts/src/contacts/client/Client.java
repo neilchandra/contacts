@@ -170,10 +170,9 @@ public class Client {
 			}
 			return groupIndex - 1;
 		} catch (NumberFormatException e) {
-			getGroupIndex(end);
+			return getGroupIndex(end);
 		}
 
-		return -1;
 	}
 
 	/**
@@ -385,8 +384,8 @@ public class Client {
 			System.out.println("Goodbye!");
 			break;
 		default:
-			System.out.println("Please input one of the following: remove, "
-					+ "group, pull, push, query path, query mutual, quit");
+			System.out.println("Please input one of the following: add, remove, "
+					+ "pull, push, query path, query mutual, quit");
 			getUserInput();
 			break;
 		}

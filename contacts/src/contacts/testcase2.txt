@@ -1,0 +1,164 @@
+Test Case #2
+
+Table of Contents:
+1) Add a contact with no friends (Alpha), creating a new top group
+2) Add a contact (Beta) with 1 friend, creating new top group
+3) Add a contact (Charlie) with 1 friend (Beta), to first group
+4) Add a contact (Delta) with 1 friend (Charlie) for linear graph
+5) Push graph to server and then a Pull
+6) Query path Alpha to Delta (should go Alpha, Beta, Charlie, Delta)
+7) Throw in some invalid inputs
+8) Query mutual between Alpha and Delta (should be none)
+9) Add a contact with two friends (Alpha and Delta) named Epsilon, try invalid friends first
+10) Query path between Alpha and Delta (should go Alpha, Epsilon, Delta)
+11) Query Mutual between Alpha and Delta (should be Epsilon)
+
+
+******************************************************
+Initial Contents : (the empty book)
+<addressBook></addressBook>
+
+***********************  1 *******************************
+Input a command:add
+name: Alpha
+number: 12345
+friends (separate by ", "): 
+Current Group: none
+(1) new group  
+Please input a number between 1 and 1
+index: 1
+Group Name: Greek
+***********************  1 *******************************
+
+***********************  2 *******************************
+
+Input a command:add
+name: Beta
+number: 18918
+friends (separate by ", "): Alpha
+Current Group: none
+(1) Greek  (2) new group  
+Please input a number between 1 and 2
+index: 2
+Group Name: Others
+***********************  2 *******************************
+
+***********************  3 *******************************
+Input a command:add
+name: Charlie
+number: 198392
+friends (separate by ", "): Charlie
+No contact found called Charlie
+friends (separate by ", "): Beta, Charlie
+No contact found called Charlie
+friends (separate by ", "): Beta
+Current Group: none
+(1) Others  (2) Greek  (3) new group  
+Please input a number between 1 and 3
+index: 2
+Current Group: Greek
+(1) new group  (2) current group
+Please input a number between 1 and 2
+index: 1
+Group Name: SubGreek
+***********************  3 *******************************
+
+***********************  4 *******************************
+Input a command:add
+name: Delta
+number: 1233123
+friends (separate by ", "): Charlie
+Current Group: none
+(1) Others  (2) Greek  (3) new group  
+Please input a number between 1 and 3
+index: 1
+Current Group: Others
+(1) new group  (2) current group
+Please input a number between 1 and 2
+index: 1
+Group Name: SubOthers
+***********************  4 *******************************
+
+***********************  5 *******************************
+Input a command:push
+OK
+Input a command:pull
+new: <addressBook><group name="Others"><group name="SubOthers"><contact><name>Delta</name><number>1233123</number><ownid>65915800</ownid><friends><id>-1891246254</id></friends></contact></group><contact><name>Beta</name><number>18918</number><ownid>2066960</ownid><friends><id>-1891246254</id> <id>63357246</id></friends></contact></group><group name="Greek"><group name="SubGreek"><contact><name>Charlie</name><number>198392</number><ownid>-1891246254</ownid><friends><id>65915800</id> <id>2066960</id></friends></contact></group><contact><name>Alpha</name><number>12345</number><ownid>63357246</ownid><friends><id>2066960</id></friends></contact></group></addressBook>
+***********************  5 *******************************
+
+***********************  6 *******************************
+Input a command:query path
+Person 1: Alpha
+Person 2: Delta
+Alpha
+Beta
+Charlie
+Delta
+***********************  6 *******************************
+
+***********************  7 *******************************
+Input a command:as;ldkf
+Please input one of the following: remove, group, pull, push, query path, query mutual, quit
+Input a command:wlslkjf
+Please input one of the following: remove, group, pull, push, query path, query mutual, quit
+Input a command:remvoe sldkfj
+Please input one of the following: remove, group, pull, push, query path, query mutual, quit
+Input a command:wero1ii1j
+Please input one of the following: remove, group, pull, push, query path, query mutual, quit
+Input a command:lkjfoi1u
+Please input one of the following: remove, group, pull, push, query path, query mutual, quit
+Input a command:slkj;
+Please input one of the following: remove, group, pull, push, query path, query mutual, quit
+Input a command:group
+group name: 
+***********************  7 *******************************
+
+***********************  8 *******************************
+Input a command:query mutual
+Person 1: Alpha
+Person 2: Delta
+no mutual friends
+***********************  8 *******************************
+
+***********************  9 *******************************
+Input a command:add
+name: Epsilon
+number: 1827382
+friends (separate by ", "): Alpha, Delta
+Current Group: none
+(1) Others  (2) Greek  (3) new group  
+Please input a number between 1 and 3
+index: 2
+Current Group: Greek
+(1) SubGreek  (2) new group  (3) current group
+Please input a number between 1 and 3
+index: 1
+Current Group: SubGreek
+(1) new group  (2) current group
+Please input a number between 1 and 2
+index: 2
+Input a command:push
+OK
+***********************  9 *******************************
+
+***********************  10 *******************************
+Input a command:query path
+Person 1: Alpha
+Person 2: slkdfj
+Invalid inputs
+Input a command:query path
+Person 1: Alpha
+Person 2: Delta
+Alpha
+Epsilon
+Delta
+***********************  10 *******************************
+
+***********************  11 *******************************
+Input a command:query mutual
+Person 1: Alpha
+Person 2: Delta
+Epsilon
+************************ 11 *****************************
+
+Output: <addressBook><group name="Others"><group name="SubOthers"><contact><name>Delta</name><number>1233123</number><ownid>65915800</ownid><friends><id>129149770</id> <id>-1891246254</id></friends></contact></group><contact><name>Beta</name><number>18918</number><ownid>2066960</ownid><friends><id>-1891246254</id> <id>63357246</id></friends></contact></group><group name="Greek"><group name="SubGreek"><contact><name>Epsilon</name><number>1827382</number><ownid>129149770</ownid><friends><id>63357246</id> <id>65915800</id></friends></contact><contact><name>Charlie</name><number>198392</number><ownid>-1891246254</ownid><friends><id>65915800</id> <id>2066960</id></friends></contact></group><contact><name>Alpha</name><number>1234</number><ownid>63357246</ownid><friends><id>129149770</id> <id>2066960</id></friends></contact></group></addressBook>
