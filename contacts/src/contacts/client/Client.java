@@ -31,6 +31,7 @@ public class Client {
 	/** the port of Client/Server interaction */
 	private int port;
 	private String host;
+	private String filePath;
 
 	/**
 	 * Constructs a Client Object
@@ -48,8 +49,9 @@ public class Client {
 	 * @throws ThisIsntMutualException
 	 *             - friendship not symmetric
 	 */
-	public Client(String filePath, String _host, int _port) throws IOException,
+	public Client(String _filePath, String _host, int _port) throws IOException,
 			ImaginaryFriendException, ThisIsntMutualException, ParseException {
+		filePath = _filePath;
 		host = _host;
 		addressBook = new AddressBook(XMLParser.parse(filePath));
 		port = _port;
@@ -353,6 +355,11 @@ public class Client {
 			break;
 		case "quit":
 			finished = true;
+			BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+			writer.write(addressBook.toXML());
+			writer.flush();
+			writer.close();
+			System.out.println("Goodbye!");
 			break;
 		default:
 			System.out.println("Please input one of the following: remove, "
