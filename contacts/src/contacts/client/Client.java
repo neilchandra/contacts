@@ -262,7 +262,14 @@ public class Client {
 	private int[] getFriends() throws IOException {
 		String friendString = getCommand("friends (separate by \", \"): ");		
 		String[] friends = friendString.split(", ");
+		
+		if(friendString.equals("")){
+			return new int [0];
+		}
+		
 		int[] friendsID = new int[friends.length];
+		
+		
 		for (int i = 0; i < friends.length; i++) {
 			try {
 				friendsID[i] = addressBook.nameToInt(friends[i]);
