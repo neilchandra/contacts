@@ -46,13 +46,7 @@ public class Graph implements IGraph {
 
 	@Override
 	public Collection<IGraphNode> getNodes() {
-		try {
-			return (new Graph(this.toXML())).nodes;
-		} catch (ImaginaryFriendException | ThisIsntMutualException
-				| ParseException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return nodes;
 	}
 
 	/**
@@ -116,7 +110,7 @@ public class Graph implements IGraph {
 	}
 
 	/**
-	 * finds all the the mutual nodes of two nodes
+	 * Finds all the the mutual nodes of two nodes
 	 * 
 	 * @param contactName1
 	 *            the name of the contact of node1
